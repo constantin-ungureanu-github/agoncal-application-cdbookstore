@@ -1,6 +1,18 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
-import org.agoncal.application.cdbookstore.model.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import javax.inject.Inject;
+
+import org.agoncal.application.cdbookstore.model.Artist;
+import org.agoncal.application.cdbookstore.model.CD;
+import org.agoncal.application.cdbookstore.model.Genre;
+import org.agoncal.application.cdbookstore.model.Item;
+import org.agoncal.application.cdbookstore.model.Label;
+import org.agoncal.application.cdbookstore.model.Musician;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -9,41 +21,29 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.*;
-
 @RunWith(Arquillian.class)
 public class CDBeanTest {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
     private CDBean cdBean;
 
     // ======================================
-    // =         Deployment methods         =
+    // = Deployment methods =
     // ======================================
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap
-                .create(JavaArchive.class)
-                .addClass(CDBean.class)
-                .addClass(CD.class)
-                .addClass(Item.class)
-                .addClass(Genre.class)
-                .addClass(Label.class)
-                .addClass(Artist.class)
-                .addClass(Musician.class)
-                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml")
+        return ShrinkWrap.create(JavaArchive.class).addClass(CDBean.class).addClass(CD.class).addClass(Item.class).addClass(Genre.class).addClass(Label.class)
+                .addClass(Artist.class).addClass(Musician.class).addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml")
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     // ======================================
-    // =            Test methods            =
+    // = Test methods =
     // ======================================
 
     @Test
@@ -68,7 +68,8 @@ public class CDBeanTest {
         cd = cdBean.findById(cd.getId());
         assertEquals("Dummy value", cd.getTitle());
 
-        // Deletes the object from the database and checks it's not there anymore
+        // Deletes the object from the database and checks it's not there
+        // anymore
         cdBean.setId(cd.getId());
         cdBean.create();
         cdBean.delete();
@@ -79,12 +80,11 @@ public class CDBeanTest {
     @Test
     public void should_paginate() {
         // Creates an empty example
-        CD example = new CD();
+        final CD example = new CD();
 
         // Paginates through the example
         cdBean.setExample(example);
         cdBean.paginate();
-        assertTrue((cdBean.getPageItems().size() == cdBean.getPageSize())
-                || (cdBean.getPageItems().size() == cdBean.getCount()));
+        assertTrue((cdBean.getPageItems().size() == cdBean.getPageSize()) || (cdBean.getPageItems().size() == cdBean.getCount()));
     }
 }

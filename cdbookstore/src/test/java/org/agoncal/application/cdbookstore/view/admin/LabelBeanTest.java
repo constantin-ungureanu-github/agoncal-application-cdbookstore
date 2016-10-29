@@ -1,5 +1,12 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import javax.inject.Inject;
+
 import org.agoncal.application.cdbookstore.model.Label;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -9,36 +16,28 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.*;
-
 @RunWith(Arquillian.class)
 public class LabelBeanTest {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
     private LabelBean labelBean;
 
     // ======================================
-    // =         Deployment methods         =
+    // = Deployment methods =
     // ======================================
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap
-                .create(JavaArchive.class)
-                .addClass(LabelBean.class)
-                .addClass(Label.class)
-                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml")
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(JavaArchive.class).addClass(LabelBean.class).addClass(Label.class)
+                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml").addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     // ======================================
-    // =            Test methods            =
+    // = Test methods =
     // ======================================
 
     @Test
@@ -63,7 +62,8 @@ public class LabelBeanTest {
         majorLabel = labelBean.findById(majorLabel.getId());
         assertEquals("Dummy value", majorLabel.getName());
 
-        // Deletes the object from the database and checks it's not there anymore
+        // Deletes the object from the database and checks it's not there
+        // anymore
         labelBean.setId(majorLabel.getId());
         labelBean.create();
         labelBean.delete();
@@ -74,12 +74,11 @@ public class LabelBeanTest {
     @Test
     public void should_paginate() {
         // Creates an empty example
-        Label example = new Label();
+        final Label example = new Label();
 
         // Paginates through the example
         labelBean.setExample(example);
         labelBean.paginate();
-        assertTrue((labelBean.getPageItems().size() == labelBean.getPageSize())
-                || (labelBean.getPageItems().size() == labelBean.getCount()));
+        assertTrue((labelBean.getPageItems().size() == labelBean.getPageSize()) || (labelBean.getPageItems().size() == labelBean.getCount()));
     }
 }

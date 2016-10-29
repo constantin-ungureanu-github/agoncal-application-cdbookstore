@@ -107,7 +107,7 @@ jpa-new-embeddable --named CreditCard ;
 jpa-new-field --named creditCardNumber --columnName credit_card_number --length 30 --not-nullable ;
 # TODO
 # jpa-new-field --named creditCardType --type ~.model.CreditCardType --columnName credit_card_type ;
-jpa-new-field --named creditCardType --type org.agoncal.application.cdbookstore.model.CreditCardType --columnName credit_card_type ;
+jpa-new-field --named creditCardType --type org.agoncal.application.cdbookstore.util.CreditCardType --columnName credit_card_type ;
 jpa-new-field --named creditCardExpDate --columnName credit_card_expiry_date --length 5 --not-nullable ;
 # Constraints
 constraint-add --onProperty creditCardNumber --constraint NotNull ;
@@ -141,7 +141,7 @@ jpa-new-field --named password --length 256 --not-nullable ;
 jpa-new-field --named uuid --length 256 ;
 # TODO FORGE-2464
 # jpa-new-field --named role --type ~.model.UserRole --columnName user_role
-jpa-new-field --named role --type org.agoncal.application.cdbookstore.model.UserRole --columnName user_role ;
+jpa-new-field --named role --type org.agoncal.application.cdbookstore.util.UserRole --columnName user_role ;
 jpa-new-field --named dateOfBirth --type java.util.Date --temporalType DATE --columnName date_of_birth ;
 # Constraints
 constraint-add --onProperty login --constraint NotNull ;
@@ -214,7 +214,7 @@ constraint-add --onProperty dateOfBirth --constraint Past ;
 
 # TODO FORGE-2464
 # jpa-new-field --named preferredLanguage --type ~.model.Language ;
-jpa-new-field --named preferredLanguage --type org.agoncal.application.cdbookstore.model.Language --columnName preferred_language ;
+jpa-new-field --named preferredLanguage --type org.agoncal.application.cdbookstore.util.Language --columnName preferred_language ;
 
 
 #  Musician Entity
@@ -288,7 +288,7 @@ jpa-new-field --named nbOfPage --type java.lang.Integer --columnName nb_of_pages
 jpa-new-field --named publicationDate --type java.util.Date --temporalType DATE --columnName publication_date ;
 # TODO FORGE-2464
 # jpa-new-field --named language --type ~.model.Language ;
-jpa-new-field --named language --type org.agoncal.application.cdbookstore.model.Language ;
+jpa-new-field --named language --type org.agoncal.application.cdbookstore.util.Language ;
 # Relationships
 # TODO FORGE-2464
 jpa-new-field --named category --type org.agoncal.application.cdbookstore.model.Category --relationshipType Many-to-One ;
@@ -387,7 +387,7 @@ constraint-add --constraint Size --min 1 --max 10 --onProperty zipcode ;
 # Credit card embeddable
 # TODO being able to add an embeddable for scaffolding
 jpa-new-field --named creditCardNumber --columnName credit_card_number ;
-jpa-new-field --named creditCardType --type org.agoncal.application.cdbookstore.model.CreditCardType --columnName credit_card_type ;
+jpa-new-field --named creditCardType --type org.agoncal.application.cdbookstore.util.CreditCardType --columnName credit_card_type ;
 jpa-new-field --named creditCardExpDate --columnName credit_card_expiry_date  ;
 constraint-add --constraint NotNull --onProperty creditCardNumber ;
 constraint-add --constraint Size --min 1 --max 30 --onProperty creditCardNumber ;

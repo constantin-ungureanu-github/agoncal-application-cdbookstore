@@ -1,5 +1,10 @@
 package org.agoncal.application.invoice.batch;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.agoncal.application.invoice.model.Invoice;
 import org.agoncal.application.invoice.model.InvoiceLine;
 import org.agoncal.application.invoice.util.ResourceProducer;
@@ -13,15 +18,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-
 @RunWith(Arquillian.class)
 public class InvoiceJobTest {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
@@ -34,27 +35,19 @@ public class InvoiceJobTest {
     private InvoiceWriter invoiceWriter;
 
     // ======================================
-    // =         Deployment methods         =
+    // = Deployment methods =
     // ======================================
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap.create(JavaArchive.class)
-                .addClass(Invoice.class)
-                .addClass(InvoiceLine.class)
-                .addClass(InvoiceSummary.class)
-                .addClass(InvoiceSummaries.class)
-                .addClass(InvoiceReader.class)
-                .addClass(InvoiceProcessor.class)
-                .addClass(InvoiceWriter.class)
-                .addPackage(ResourceProducer.class.getPackage())
-                .addAsManifestResource("META-INF/persistence.xml", "persistence.xml")
-                .addAsResource("import_h2.sql", "import_h2.sql")
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(JavaArchive.class).addClass(Invoice.class).addClass(InvoiceLine.class).addClass(InvoiceSummary.class)
+                .addClass(InvoiceSummaries.class).addClass(InvoiceReader.class).addClass(InvoiceProcessor.class).addClass(InvoiceWriter.class)
+                .addPackage(ResourceProducer.class.getPackage()).addAsManifestResource("META-INF/persistence.xml", "persistence.xml")
+                .addAsResource("import_h2.sql", "import_h2.sql").addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     // ======================================
-    // =            Test methods            =
+    // = Test methods =
     // ======================================
 
     @Test
@@ -64,7 +57,8 @@ public class InvoiceJobTest {
         Assert.assertNotNull(invoiceWriter);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void should_process_summary() throws Exception {
         List<Invoice> invoices = (List<Invoice>) invoiceReader.readItem();
         Assert.assertEquals(12, invoices.size());

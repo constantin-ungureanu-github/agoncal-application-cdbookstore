@@ -4,26 +4,19 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.context.FacesContext;
+import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletResponse;
-import java.util.logging.Logger;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@Singleton
 public class ResourceProducer {
-
-    // ======================================
-    // =              Producers             =
-    // ======================================
-
     @Produces
     @PersistenceContext(unitName = "applicationCDBookStorePU")
-    private EntityManager em;
+    private EntityManager entityManager;
 
     @Produces
     @RequestScoped
@@ -38,7 +31,7 @@ public class ResourceProducer {
     }
 
     @Produces
-    public Logger produceLogger(InjectionPoint injectionPoint) {
-        return Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
+    public Logger produceLogger(final InjectionPoint injectionPoint) {
+        return LoggerFactory.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
     }
 }

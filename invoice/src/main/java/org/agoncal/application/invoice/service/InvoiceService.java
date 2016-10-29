@@ -1,24 +1,25 @@
 package org.agoncal.application.invoice.service;
 
-import org.agoncal.application.invoice.model.Invoice;
-import org.agoncal.application.invoice.model.InvoiceLine;
-import org.agoncal.application.invoice.util.Discount;
-import org.agoncal.application.invoice.util.Vat;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+
+import org.agoncal.application.invoice.model.Invoice;
+import org.agoncal.application.invoice.model.InvoiceLine;
+import org.agoncal.application.invoice.util.Discount;
+import org.agoncal.application.invoice.util.Vat;
 
 @Transactional
 public class InvoiceService {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
@@ -33,7 +34,7 @@ public class InvoiceService {
     private Float discountRate;
 
     // ======================================
-    // =          Business methods          =
+    // = Business methods =
     // ======================================
 
     public Invoice persist(Invoice invoice) {

@@ -1,5 +1,12 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import javax.inject.Inject;
+
 import org.agoncal.application.cdbookstore.model.Item;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -9,36 +16,28 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.*;
-
 @RunWith(Arquillian.class)
 public class ItemBeanTest {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
     private ItemBean itemBean;
 
     // ======================================
-    // =         Deployment methods         =
+    // = Deployment methods =
     // ======================================
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap
-                .create(JavaArchive.class)
-                .addClass(ItemBean.class)
-                .addClass(Item.class)
-                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml")
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(JavaArchive.class).addClass(ItemBean.class).addClass(Item.class)
+                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml").addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     // ======================================
-    // =            Test methods            =
+    // = Test methods =
     // ======================================
 
     @Test
@@ -63,7 +62,8 @@ public class ItemBeanTest {
         item = itemBean.findById(item.getId());
         assertEquals("Dummy value", item.getTitle());
 
-        // Deletes the object from the database and checks it's not there anymore
+        // Deletes the object from the database and checks it's not there
+        // anymore
         itemBean.setId(item.getId());
         itemBean.create();
         itemBean.delete();
@@ -74,12 +74,11 @@ public class ItemBeanTest {
     @Test
     public void should_paginate() {
         // Creates an empty example
-        Item example = new Item();
+        final Item example = new Item();
 
         // Paginates through the example
         itemBean.setExample(example);
         itemBean.paginate();
-        assertTrue((itemBean.getPageItems().size() == itemBean.getPageSize())
-                || (itemBean.getPageItems().size() == itemBean.getCount()));
+        assertTrue((itemBean.getPageItems().size() == itemBean.getPageSize()) || (itemBean.getPageItems().size() == itemBean.getCount()));
     }
 }

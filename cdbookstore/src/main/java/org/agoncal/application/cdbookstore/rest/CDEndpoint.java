@@ -1,51 +1,46 @@
 package org.agoncal.application.cdbookstore.rest;
 
-import org.agoncal.application.cdbookstore.model.CD;
+import java.util.List;
 
 import javax.inject.Inject;
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-import java.util.List;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import org.agoncal.application.cdbookstore.model.CD;
 
 @Path("/cds")
 @Transactional
 public class CDEndpoint {
 
-    // ======================================
-    // =          Injection Points          =
-    // ======================================
-
     @Inject
     private EntityManager em;
 
-    // ======================================
-    // =          Business methods          =
-    // ======================================
-
     @POST
-    @Consumes({"application/xml", "application/json"})
-    public Response create(CD entity) {
+    @Consumes({ "application/xml", "application/json" })
+    public Response create(final CD entity) {
         em.persist(entity);
-        return Response.created(
-                UriBuilder.fromResource(CDEndpoint.class)
-                        .path(String.valueOf(entity.getId())).build())
-                .build();
+        return Response.created(UriBuilder.fromResource(CDEndpoint.class).path(String.valueOf(entity.getId())).build()).build();
     }
 
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
-    public Response deleteById(@PathParam("id") Long id) {
-        CD entity = em.find(CD.class, id);
+    public Response deleteById(@PathParam("id") final Long id) {
+        final CD entity = em.find(CD.class, id);
         if (entity == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -55,17 +50,16 @@ public class CDEndpoint {
 
     @GET
     @Path("/{id:[0-9][0-9]*}")
-    @Produces({"application/xml", "application/json"})
-    public Response findById(@PathParam("id") Long id) {
-        TypedQuery<CD> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT c FROM CD c LEFT JOIN FETCH c.label LEFT JOIN FETCH c.musicians LEFT JOIN FETCH c.genre WHERE c.id = :entityId ORDER BY c.id",
-                        CD.class);
+    @Produces({ "application/xml", "application/json" })
+    public Response findById(@PathParam("id") final Long id) {
+        final TypedQuery<CD> findByIdQuery = em.createQuery(
+                "SELECT DISTINCT c FROM CD c LEFT JOIN FETCH c.label LEFT JOIN FETCH c.musicians LEFT JOIN FETCH c.genre WHERE c.id = :entityId ORDER BY c.id",
+                CD.class);
         findByIdQuery.setParameter("entityId", id);
         CD entity;
         try {
             entity = findByIdQuery.getSingleResult();
-        } catch (NoResultException nre) {
+        } catch (final NoResultException nre) {
             entity = null;
         }
         if (entity == null) {
@@ -75,13 +69,10 @@ public class CDEndpoint {
     }
 
     @GET
-    @Produces({"application/xml", "application/json"})
-    public List<CD> listAll(@QueryParam("start") Integer startPosition,
-                            @QueryParam("max") Integer maxResult) {
-        TypedQuery<CD> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT c FROM CD c LEFT JOIN FETCH c.label LEFT JOIN FETCH c.musicians LEFT JOIN FETCH c.genre ORDER BY c.id",
-                        CD.class);
+    @Produces({ "application/xml", "application/json" })
+    public List<CD> listAll(@QueryParam("start") final Integer startPosition, @QueryParam("max") final Integer maxResult) {
+        final TypedQuery<CD> findAllQuery = em
+                .createQuery("SELECT DISTINCT c FROM CD c LEFT JOIN FETCH c.label LEFT JOIN FETCH c.musicians LEFT JOIN FETCH c.genre ORDER BY c.id", CD.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }
@@ -94,8 +85,8 @@ public class CDEndpoint {
 
     @PUT
     @Path("/{id:[0-9][0-9]*}")
-    @Consumes({"application/xml", "application/json"})
-    public Response update(@PathParam("id") Long id, CD entity) {
+    @Consumes({ "application/xml", "application/json" })
+    public Response update(@PathParam("id") final Long id, CD entity) {
         if (entity == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -110,9 +101,8 @@ public class CDEndpoint {
         }
         try {
             entity = em.merge(entity);
-        } catch (OptimisticLockException e) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(e.getEntity()).build();
+        } catch (final OptimisticLockException e) {
+            return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
         }
 
         return Response.noContent().build();

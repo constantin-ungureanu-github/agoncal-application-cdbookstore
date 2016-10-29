@@ -1,42 +1,22 @@
 package org.agoncal.application.invoice.batch;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
-
 public class InvoiceSummary {
-
-    // ======================================
-    // =             Attributes             =
-    // ======================================
-
     private Integer month;
     private Integer numberOfInvoices;
     private Float total;
 
-    // ======================================
-    // =            Constructors            =
-    // ======================================
-
-
     public InvoiceSummary() {
     }
 
-    public InvoiceSummary(Integer month) {
+    public InvoiceSummary(final Integer month) {
         this.month = month;
     }
-
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
 
     public Integer getMonth() {
         return month;
     }
 
-    public void setMonth(Integer month) {
+    public void setMonth(final Integer month) {
         this.month = month;
     }
 
@@ -44,7 +24,7 @@ public class InvoiceSummary {
         return numberOfInvoices;
     }
 
-    public void setNumberOfInvoices(Integer numberOfInvoices) {
+    public void setNumberOfInvoices(final Integer numberOfInvoices) {
         this.numberOfInvoices = numberOfInvoices;
     }
 
@@ -52,7 +32,7 @@ public class InvoiceSummary {
         return total;
     }
 
-    public void setTotal(Float total) {
+    public void setTotal(final Float total) {
         this.total = total;
     }
 }

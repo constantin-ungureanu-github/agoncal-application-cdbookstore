@@ -1,6 +1,21 @@
 package org.agoncal.application.cdbookstore.model;
 
-import javax.persistence.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
@@ -8,61 +23,65 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @MappedSuperclass
 @XmlAccessorType(XmlAccessType.FIELD)
+@NoArgsConstructor
+@ToString
 public class Artist {
-
-    // ======================================
-    // =             Attributes             =
-    // ======================================
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false)
     @XmlTransient
-    protected Long id;
+    @Getter
+    @Setter
+    private Long id;
+
     @Version
     @Column(name = "version")
     @XmlTransient
-    protected int version;
+    @Getter
+    @Setter
+    private int version;
 
     @Column(length = 50, name = "first_name", nullable = false)
     @NotNull
     @Size(min = 2, max = 50)
     @XmlElement(name = "first-name")
-    protected String firstName;
+    @Getter
+    @Setter
+    private String firstName;
 
     @Column(length = 50, name = "last_name", nullable = false)
     @NotNull
     @Size(min = 2, max = 50)
     @XmlElement(name = "last-name")
-    protected String lastName;
+    @Getter
+    @Setter
+    private String lastName;
 
     @Column(length = 5000)
     @Size(max = 5000)
-    protected String bio;
+    @Getter
+    @Setter
+    private String bio;
 
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
     @Past
-    protected Date dateOfBirth;
+    @Getter
+    @Setter
+    private Date dateOfBirth;
 
     @Transient
-    protected Integer age;
-
-    // ======================================
-    // =         Lifecycle methods          =
-    // ======================================
+    @Getter
+    @Setter
+    private Integer age;
 
     @PostLoad
     @PostPersist
@@ -73,94 +92,14 @@ public class Artist {
             return;
         }
 
-        Calendar birth = new GregorianCalendar();
+        final Calendar birth = new GregorianCalendar();
         birth.setTime(dateOfBirth);
-        Calendar now = new GregorianCalendar();
+        final Calendar now = new GregorianCalendar();
         now.setTime(new Date());
         int adjust = 0;
-        if (now.get(Calendar.DAY_OF_YEAR) - birth.get(Calendar.DAY_OF_YEAR) < 0) {
+        if ((now.get(Calendar.DAY_OF_YEAR) - birth.get(Calendar.DAY_OF_YEAR)) < 0) {
             adjust = -1;
         }
-        age = now.get(Calendar.YEAR) - birth.get(Calendar.YEAR) + adjust;
-    }
-
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public int getVersion() {
-        return this.version;
-    }
-
-    public void setVersion(final int version) {
-        this.version = version;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    // ======================================
-    // =   Methods hash, equals, toString   =
-    // ======================================
-
-    @Override
-    public String toString() {
-        String result = getClass().getSimpleName() + " ";
-        if (firstName != null && !firstName.trim().isEmpty())
-            result += "firstName: " + firstName;
-        if (lastName != null && !lastName.trim().isEmpty())
-            result += ", lastName: " + lastName;
-        if (bio != null && !bio.trim().isEmpty())
-            result += ", bio: " + bio;
-        if (dateOfBirth != null)
-            result += ", dateOfBirth: " + dateOfBirth;
-        if (age != null)
-            result += ", age: " + age;
-        return result;
+        age = (now.get(Calendar.YEAR) - birth.get(Calendar.YEAR)) + adjust;
     }
 }

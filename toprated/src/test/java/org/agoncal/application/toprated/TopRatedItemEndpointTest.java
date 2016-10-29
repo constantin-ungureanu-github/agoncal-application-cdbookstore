@@ -1,5 +1,22 @@
 package org.agoncal.application.toprated;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.StringReader;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonReader;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -11,22 +28,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonReader;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.StringReader;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(Arquillian.class)
 @RunAsClient
 public class TopRatedItemEndpointTest {
@@ -36,16 +37,9 @@ public class TopRatedItemEndpointTest {
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
-        return ShrinkWrap
-                .create(WebArchive.class)
-                .addClass(RatedItem.class)
-                .addClass(RatedItems.class)
-                .addClass(ResourceProducer.class)
-                .addClass(RestApplication.class)
-                .addClass(TopRatedItemEndpoint.class)
-                .addAsResource("META-INF/persistence-test.xml", "META-INF/persistence.xml")
-                .addAsResource("import_h2.sql", "import_h2.sql")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(WebArchive.class).addClass(RatedItem.class).addClass(RatedItems.class).addClass(ResourceProducer.class)
+                .addClass(RestApplication.class).addClass(TopRatedItemEndpoint.class).addAsResource("META-INF/persistence-test.xml", "META-INF/persistence.xml")
+                .addAsResource("import_h2.sql", "import_h2.sql").addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     @Test
@@ -55,7 +49,8 @@ public class TopRatedItemEndpointTest {
         assertEquals(Response.Status.OK.getStatusCode(), target.request(MediaType.APPLICATION_JSON).get().getStatus());
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void should_check_items() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseURL).path("toprateditems");

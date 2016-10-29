@@ -29,7 +29,7 @@
         <!--<class>org.agoncal.application.cdbookstore.model.Genre</class>-->
         <!--<class>org.agoncal.application.cdbookstore.model.Item</class>-->
         <!--<class>org.agoncal.application.cdbookstore.model.Label</class>-->
-        <!--<class>org.agoncal.application.cdbookstore.model.LanguageConverter</class>-->
+        <!--<class>org.agoncal.application.cdbookstore.util.LanguageConverter</class>-->
         <!--<class>org.agoncal.application.cdbookstore.model.Musician</class>-->
         <!--<class>org.agoncal.application.cdbookstore.model.Publisher</class>-->
         <!--<class>org.agoncal.application.cdbookstore.model.User</class>-->

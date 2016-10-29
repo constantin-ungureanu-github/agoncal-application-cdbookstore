@@ -1,5 +1,12 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import javax.inject.Inject;
+
 import org.agoncal.application.cdbookstore.model.Country;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -10,36 +17,28 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.*;
-
 @RunWith(Arquillian.class)
 public class CountryBeanTest {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
     private CountryBean countryBean;
 
     // ======================================
-    // =         Deployment methods         =
+    // = Deployment methods =
     // ======================================
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap
-                .create(JavaArchive.class)
-                .addClass(CountryBean.class)
-                .addClass(Country.class)
-                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml")
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(JavaArchive.class).addClass(CountryBean.class).addClass(Country.class)
+                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml").addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     // ======================================
-    // =            Test methods            =
+    // = Test methods =
     // ======================================
 
     @Test
@@ -68,7 +67,8 @@ public class CountryBeanTest {
         country = countryBean.findById(country.getId());
         assertEquals("Dummy value", country.getName());
 
-        // Deletes the object from the database and checks it's not there anymore
+        // Deletes the object from the database and checks it's not there
+        // anymore
         countryBean.setId(country.getId());
         countryBean.create();
         countryBean.delete();
@@ -79,12 +79,11 @@ public class CountryBeanTest {
     @Test
     public void should_paginate() {
         // Creates an empty example
-        Country example = new Country();
+        final Country example = new Country();
 
         // Paginates through the example
         countryBean.setExample(example);
         countryBean.paginate();
-        assertTrue((countryBean.getPageItems().size() == countryBean.getPageSize())
-                || (countryBean.getPageItems().size() == countryBean.getCount()));
+        assertTrue((countryBean.getPageItems().size() == countryBean.getPageSize()) || (countryBean.getPageItems().size() == countryBean.getCount()));
     }
 }

@@ -1,5 +1,12 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import javax.inject.Inject;
+
 import org.agoncal.application.cdbookstore.model.Genre;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -9,36 +16,28 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.*;
-
 @RunWith(Arquillian.class)
 public class GenreBeanTest {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
     private GenreBean genreBean;
 
     // ======================================
-    // =         Deployment methods         =
+    // = Deployment methods =
     // ======================================
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap
-                .create(JavaArchive.class)
-                .addClass(GenreBean.class)
-                .addClass(Genre.class)
-                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml")
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(JavaArchive.class).addClass(GenreBean.class).addClass(Genre.class)
+                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml").addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     // ======================================
-    // =            Test methods            =
+    // = Test methods =
     // ======================================
 
     @Test
@@ -63,7 +62,8 @@ public class GenreBeanTest {
         genre = genreBean.findById(genre.getId());
         assertEquals("Dummy value", genre.getName());
 
-        // Deletes the object from the database and checks it's not there anymore
+        // Deletes the object from the database and checks it's not there
+        // anymore
         genreBean.setId(genre.getId());
         genreBean.create();
         genreBean.delete();
@@ -74,12 +74,11 @@ public class GenreBeanTest {
     @Test
     public void should_paginate() {
         // Creates an empty example
-        Genre example = new Genre();
+        final Genre example = new Genre();
 
         // Paginates through the example
         genreBean.setExample(example);
         genreBean.paginate();
-        assertTrue((genreBean.getPageItems().size() == genreBean.getPageSize())
-                || (genreBean.getPageItems().size() == genreBean.getCount()));
+        assertTrue((genreBean.getPageItems().size() == genreBean.getPageSize()) || (genreBean.getPageItems().size() == genreBean.getCount()));
     }
 }

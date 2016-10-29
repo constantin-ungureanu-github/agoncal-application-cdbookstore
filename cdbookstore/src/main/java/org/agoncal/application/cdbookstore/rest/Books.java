@@ -1,38 +1,27 @@
 package org.agoncal.application.cdbookstore.rest;
 
-import org.agoncal.application.cdbookstore.model.Book;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+
+import org.agoncal.application.cdbookstore.model.Book;
+
 @XmlRootElement
 @XmlSeeAlso(Book.class)
 public class Books extends ArrayList<Book> {
-
-    // ======================================
-    // =            Constructors            =
-    // ======================================
+    private static final long serialVersionUID = 1L;
 
     public Books() {
         super();
     }
 
-    public Books(Collection<? extends Book> c) {
+    public Books(final Collection<? extends Book> c) {
         super(c);
     }
-
-    // ======================================
-    // =          Getters & Setters         =
-    // ======================================
 
     @XmlElement(name = "book")
     public List<Book> getBooks() {

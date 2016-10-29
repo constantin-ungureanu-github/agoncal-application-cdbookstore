@@ -1,65 +1,61 @@
 package org.agoncal.application.invoice.model;
 
-import javax.persistence.*;
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.Objects;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "invoice_line")
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class InvoiceLine implements Serializable {
-
-    // ======================================
-    // =             Attributes             =
-    // ======================================
-
+    private static final long serialVersionUID = 1L;
     @Column(length = 200)
     @NotNull
     @Size(min = 1, max = 200)
     protected String title;
+
     @Column(name = "unit_cost")
     @NotNull
     @Min(1)
     protected Float unitCost;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
+
     @Version
     @Column(name = "version")
     private int version;
+
     @Column(nullable = false)
     @NotNull
     @Min(1)
     private Integer quantity;
 
-    // ======================================
-    // =            Constructors            =
-    // ======================================
-
-    public InvoiceLine() {
-    }
-
-    public InvoiceLine(Integer quantity, String title, Float unitCost) {
+    public InvoiceLine(final Integer quantity, final String title, final Float unitCost) {
         this.quantity = quantity;
         this.title = title;
         this.unitCost = unitCost;
     }
 
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
-
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(final Long id) {
@@ -67,7 +63,7 @@ public class InvoiceLine implements Serializable {
     }
 
     public int getVersion() {
-        return this.version;
+        return version;
     }
 
     public void setVersion(final int version) {
@@ -78,7 +74,7 @@ public class InvoiceLine implements Serializable {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(final Integer quantity) {
         this.quantity = quantity;
     }
 
@@ -86,7 +82,7 @@ public class InvoiceLine implements Serializable {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -94,37 +90,7 @@ public class InvoiceLine implements Serializable {
         return unitCost;
     }
 
-    public void setUnitCost(Float unitCost) {
+    public void setUnitCost(final Float unitCost) {
         this.unitCost = unitCost;
-    }
-
-    // ======================================
-    // =   Methods hash, equals, toString   =
-    // ======================================
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        InvoiceLine that = (InvoiceLine) o;
-        return Objects.equals(quantity, that.quantity) &&
-                Objects.equals(title, that.title) &&
-                Objects.equals(unitCost, that.unitCost);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(quantity, title, unitCost);
-    }
-
-    @Override
-    public String toString() {
-        return "InvoiceLine{" +
-                "id=" + id +
-                ", version=" + version +
-                ", quantity=" + quantity +
-                ", title='" + title + '\'' +
-                ", unitCost=" + unitCost +
-                '}';
     }
 }

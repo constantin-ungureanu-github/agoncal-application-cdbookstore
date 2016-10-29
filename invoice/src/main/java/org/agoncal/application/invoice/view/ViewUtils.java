@@ -6,70 +6,57 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.persistence.Id;
 
-/**
- * Utilities for working with Java Server Faces views.
- */
-
 public final class ViewUtils {
+    public static <T> List<T> asList(final Collection<T> collection) {
 
-	public static <T> List<T> asList(Collection<T> collection) {
+        if (collection == null) {
+            return null;
+        }
 
-		if (collection == null) {
-			return null;
-		}
+        return new ArrayList<T>(collection);
+    }
 
-		return new ArrayList<T>(collection);
-	}
+    public static String display(final Object object) {
+        if (object == null) {
+            return null;
+        }
 
-	public static String display(Object object) {
+        try {
+            // Invoke toString if declared in the class. If not found, the
+            // NoSuchMethodException is caught and handled
+            object.getClass().getDeclaredMethod("toString");
+            return object.toString();
+        } catch (final NoSuchMethodException noMethodEx) {
+            try {
+                for (final Field field : object.getClass().getDeclaredFields()) {
+                    // Find the primary key field and display it
+                    if (field.getAnnotation(Id.class) != null) {
+                        // Find a matching getter and invoke it to display the key
+                        for (final Method method : object.getClass().getDeclaredMethods()) {
+                            if (method.equals(new PropertyDescriptor(field.getName(), object.getClass()).getReadMethod())) {
+                                return method.invoke(object).toString();
+                            }
+                        }
+                    }
+                }
+                for (final Method method : object.getClass().getDeclaredMethods()) {
+                    // Find the primary key as a property instead of a field, and display it
+                    if (method.getAnnotation(Id.class) != null) {
+                        return method.invoke(object).toString();
+                    }
+                }
+            } catch (final Exception ex) {
+                // Unlikely, but abort and stop view generation if any exception is thrown
+                throw new RuntimeException(ex);
+            }
+        }
 
-		if (object == null) {
-			return null;
-		}
+        return null;
+    }
 
-		try {
-			// Invoke toString if declared in the class. If not found, the
-			// NoSuchMethodException is caught and handled
-			object.getClass().getDeclaredMethod("toString");
-			return object.toString();
-		} catch (NoSuchMethodException noMethodEx) {
-			try {
-				for (Field field : object.getClass().getDeclaredFields()) {
-					// Find the primary key field and display it
-					if (field.getAnnotation(Id.class) != null) {
-						// Find a matching getter and invoke it to display the
-						// key
-						for (Method method : object.getClass()
-								.getDeclaredMethods()) {
-							if (method.equals(new PropertyDescriptor(field
-									.getName(), object.getClass())
-									.getReadMethod())) {
-								return method.invoke(object).toString();
-							}
-						}
-					}
-				}
-				for (Method method : object.getClass().getDeclaredMethods()) {
-					// Find the primary key as a property instead of a field,
-					// and display it
-					if (method.getAnnotation(Id.class) != null) {
-						return method.invoke(object).toString();
-					}
-				}
-			} catch (Exception ex) {
-				// Unlikely, but abort and stop view generation if any exception
-				// is thrown
-				throw new RuntimeException(ex);
-			}
-		}
-
-		return null;
-	}
-
-	private ViewUtils() {
-
-		// Can never be called
-	}
+    private ViewUtils() {
+    }
 }

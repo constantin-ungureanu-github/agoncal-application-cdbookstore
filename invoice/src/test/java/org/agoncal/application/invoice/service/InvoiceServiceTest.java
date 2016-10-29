@@ -1,8 +1,12 @@
 package org.agoncal.application.invoice.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import javax.inject.Inject;
+
 import org.agoncal.application.invoice.model.Invoice;
 import org.agoncal.application.invoice.model.InvoiceLine;
-import org.agoncal.application.invoice.service.InvoiceService;
 import org.agoncal.application.invoice.util.ResourceProducer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -13,38 +17,29 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 @RunWith(Arquillian.class)
 public class InvoiceServiceTest {
 
     // ======================================
-    // =          Injection Points          =
+    // = Injection Points =
     // ======================================
 
     @Inject
     private InvoiceService invoiceService;
 
     // ======================================
-    // =         Deployment methods         =
+    // = Deployment methods =
     // ======================================
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap.create(JavaArchive.class)
-                .addClass(Invoice.class)
-                .addClass(InvoiceLine.class)
-                .addClass(InvoiceService.class)
-                .addPackage(ResourceProducer.class.getPackage())
-                .addAsManifestResource("META-INF/persistence.xml", "persistence.xml")
+        return ShrinkWrap.create(JavaArchive.class).addClass(Invoice.class).addClass(InvoiceLine.class).addClass(InvoiceService.class)
+                .addPackage(ResourceProducer.class.getPackage()).addAsManifestResource("META-INF/persistence.xml", "persistence.xml")
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     // ======================================
-    // =            Test methods            =
+    // = Test methods =
     // ======================================
 
     @Test
@@ -84,7 +79,8 @@ public class InvoiceServiceTest {
         invoice = invoiceService.findById(invoice.getId());
         assertEquals("A new first name", invoice.getFirstName());
 
-        // Deletes the object from the database and checks it's not there anymore
+        // Deletes the object from the database and checks it's not there
+        // anymore
         invoiceService.remove(invoice);
         assertEquals(initialSize, invoiceService.listAll().size());
     }

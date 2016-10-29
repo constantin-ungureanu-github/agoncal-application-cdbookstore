@@ -1,8 +1,15 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import javax.inject.Inject;
+
 import org.agoncal.application.cdbookstore.model.User;
-import org.agoncal.application.cdbookstore.model.UserRole;
 import org.agoncal.application.cdbookstore.util.PasswordUtils;
+import org.agoncal.application.cdbookstore.util.UserRole;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -12,39 +19,17 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.*;
-
 @RunWith(Arquillian.class)
 public class UserBeanTest {
-
-    // ======================================
-    // =          Injection Points          =
-    // ======================================
 
     @Inject
     private UserBean userBean;
 
-    // ======================================
-    // =         Deployment methods         =
-    // ======================================
-
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap
-                .create(JavaArchive.class)
-                .addClass(UserBean.class)
-                .addClass(User.class)
-                .addClass(UserRole.class)
-                .addClass(PasswordUtils.class)
-                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml")
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(JavaArchive.class).addClass(UserBean.class).addClass(User.class).addClass(UserRole.class).addClass(PasswordUtils.class)
+                .addAsManifestResource("META-INF/persistence-test.xml", "persistence.xml").addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
-
-    // ======================================
-    // =            Test methods            =
-    // ======================================
 
     @Test
     public void should_be_deployed() {
@@ -72,7 +57,8 @@ public class UserBeanTest {
         user = userBean.findById(user.getId());
         assertEquals("Dummy value", user.getFirstName());
 
-        // Deletes the object from the database and checks it's not there anymore
+        // Deletes the object from the database and checks it's not there
+        // anymore
         userBean.setId(user.getId());
         userBean.create();
         userBean.delete();
@@ -83,12 +69,11 @@ public class UserBeanTest {
     @Test
     public void should_paginate() {
         // Creates an empty example
-        User example = new User();
+        final User example = new User();
 
         // Paginates through the example
         userBean.setExample(example);
         userBean.paginate();
-        assertTrue((userBean.getPageItems().size() == userBean.getPageSize())
-                || (userBean.getPageItems().size() == userBean.getCount()));
+        assertTrue((userBean.getPageItems().size() == userBean.getPageSize()) || (userBean.getPageItems().size() == userBean.getCount()));
     }
 }

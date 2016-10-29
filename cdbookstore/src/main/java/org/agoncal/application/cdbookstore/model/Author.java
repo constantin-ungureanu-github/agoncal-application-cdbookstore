@@ -4,69 +4,26 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import org.agoncal.application.cdbookstore.util.Language;
+import org.agoncal.application.cdbookstore.util.LanguageConverter;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
+@NoArgsConstructor
+@ToString
 public class Author extends Artist {
-
-    // ======================================
-    // =             Attributes             =
-    // ======================================
-
     @Column(name = "preferred_language")
     @Convert(converter = LanguageConverter.class)
+    @Getter
+    @Setter
     private Language preferredLanguage;
 
-    // ======================================
-    // =            Constructors            =
-    // ======================================
-
-    public Author() {
-    }
-
-    public Author(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
-
-    public Language getPreferredLanguage() {
-        return preferredLanguage;
-    }
-
-    public void setPreferredLanguage(Language preferredLanguage) {
-        this.preferredLanguage = preferredLanguage;
-    }
-
-    // ======================================
-    // =   Methods hash, equals, toString   =
-    // ======================================
-
-    @Override
-    public String toString() {
-        String result = getClass().getSimpleName() + " ";
-        if (id != null)
-            result += "id: " + id;
-        result += ", version: " + version;
-        if (firstName != null && !firstName.trim().isEmpty())
-            result += ", firstName: " + firstName;
-        if (lastName != null && !lastName.trim().isEmpty())
-            result += ", lastName: " + lastName;
-        if (bio != null && !bio.trim().isEmpty())
-            result += ", bio: " + bio;
-        if (dateOfBirth != null)
-            result += ", dateOfBirth: " + dateOfBirth;
-        if (age != null)
-            result += ", age: " + age;
-        if (preferredLanguage != null)
-            result += ", preferredLanguage: " + preferredLanguage;
-        return result;
+    public Author(final String firstName, final String lastName) {
+        setFirstName(firstName);
+        setLastName(lastName);
     }
 }

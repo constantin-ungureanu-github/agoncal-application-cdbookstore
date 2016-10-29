@@ -1,7 +1,8 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
-import org.agoncal.application.cdbookstore.model.Category;
-import org.agoncal.application.cdbookstore.util.Loggable;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
@@ -22,16 +23,16 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.agoncal.application.cdbookstore.model.Category;
+import org.agoncal.application.cdbookstore.util.Loggable;
 
 /**
  * Backing bean for Category entities.
  * <p/>
- * This class provides CRUD functionality for all Category entities. It focuses purely on Java EE 6 standards (e.g.
- * <tt>&#64;ConversationScoped</tt> for state management, <tt>PersistenceContext</tt> for persistence,
- * <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base class.
+ * This class provides CRUD functionality for all Category entities. It focuses purely on Java EE 6 standards (e.g. <tt>&#64;ConversationScoped</tt> for state
+ * management, <tt>PersistenceContext</tt> for persistence, <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base
+ * class.
  */
 
 @Named
@@ -42,9 +43,9 @@ public class CategoryBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-   /*
-    * Support creating and retrieving Category entities
-    */
+    /*
+     * Support creating and retrieving Category entities
+     */
 
     private Long id;
     private Category category;
@@ -61,33 +62,33 @@ public class CategoryBean implements Serializable {
     private Category add = new Category();
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-   /*
-    * Support updating and deleting Category entities
-    */
+    /*
+     * Support updating and deleting Category entities
+     */
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
     public Category getCategory() {
-        return this.category;
+        return category;
     }
 
-   /*
-    * Support searching Category entities with pagination
-    */
+    /*
+     * Support searching Category entities with pagination
+     */
 
-    public void setCategory(Category category) {
+    public void setCategory(final Category category) {
         this.category = category;
     }
 
     public String create() {
 
-        this.conversation.begin();
-        this.conversation.setTimeout(1800000L);
+        conversation.begin();
+        conversation.setTimeout(1800000L);
         return "create?faces-redirect=true";
     }
 
@@ -97,62 +98,60 @@ public class CategoryBean implements Serializable {
             return;
         }
 
-        if (this.conversation.isTransient()) {
-            this.conversation.begin();
-            this.conversation.setTimeout(1800000L);
+        if (conversation.isTransient()) {
+            conversation.begin();
+            conversation.setTimeout(1800000L);
         }
 
-        if (this.id == null) {
-            this.category = this.example;
+        if (id == null) {
+            category = example;
         } else {
-            this.category = findById(getId());
+            category = findById(getId());
         }
     }
 
-    public Category findById(Long id) {
+    public Category findById(final Long id) {
 
-        return this.entityManager.find(Category.class, id);
+        return entityManager.find(Category.class, id);
     }
 
     public String update() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            if (this.id == null) {
-                this.entityManager.persist(this.category);
+            if (id == null) {
+                entityManager.persist(category);
                 return "search?faces-redirect=true";
             } else {
-                this.entityManager.merge(this.category);
-                return "view?faces-redirect=true&id=" + this.category.getId();
+                entityManager.merge(category);
+                return "view?faces-redirect=true&id=" + category.getId();
             }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public String delete() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            Category deletableEntity = findById(getId());
+            final Category deletableEntity = findById(getId());
 
-            this.entityManager.remove(deletableEntity);
-            this.entityManager.flush();
+            entityManager.remove(deletableEntity);
+            entityManager.flush();
             return "search?faces-redirect=true";
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public int getPage() {
-        return this.page;
+        return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         this.page = page;
     }
 
@@ -161,98 +160,87 @@ public class CategoryBean implements Serializable {
     }
 
     public Category getExample() {
-        return this.example;
+        return example;
     }
 
-    public void setExample(Category example) {
+    public void setExample(final Category example) {
         this.example = example;
     }
 
     public String search() {
-        this.page = 0;
+        page = 0;
         return null;
     }
 
     public void paginate() {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         // Populate this.count
 
         CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
         Root<Category> root = countCriteria.from(Category.class);
-        countCriteria = countCriteria.select(builder.count(root)).where(
-                getSearchPredicates(root));
-        this.count = this.entityManager.createQuery(countCriteria)
-                .getSingleResult();
+        countCriteria = countCriteria.select(builder.count(root)).where(getSearchPredicates(root));
+        count = entityManager.createQuery(countCriteria).getSingleResult();
 
         // Populate this.pageItems
 
-        CriteriaQuery<Category> criteria = builder.createQuery(Category.class);
+        final CriteriaQuery<Category> criteria = builder.createQuery(Category.class);
         root = criteria.from(Category.class);
-        TypedQuery<Category> query = this.entityManager.createQuery(criteria
-                .select(root).where(getSearchPredicates(root)));
-        query.setFirstResult(this.page * getPageSize()).setMaxResults(
-                getPageSize());
-        this.pageItems = query.getResultList();
+        final TypedQuery<Category> query = entityManager.createQuery(criteria.select(root).where(getSearchPredicates(root)));
+        query.setFirstResult(page * getPageSize()).setMaxResults(getPageSize());
+        pageItems = query.getResultList();
     }
 
-    private Predicate[] getSearchPredicates(Root<Category> root) {
+    private Predicate[] getSearchPredicates(final Root<Category> root) {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-        List<Predicate> predicatesList = new ArrayList<>();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final List<Predicate> predicatesList = new ArrayList<>();
 
-        String name = this.example.getName();
-        if (name != null && !"".equals(name)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("name")),
-                    '%' + name.toLowerCase() + '%'));
+        final String name = example.getName();
+        if ((name != null) && !"".equals(name)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("name")), '%' + name.toLowerCase() + '%'));
         }
 
         return predicatesList.toArray(new Predicate[predicatesList.size()]);
     }
 
-   /*
-    * Support listing and POSTing back Category entities (e.g. from inside an HtmlSelectOneMenu)
-    */
+    /*
+     * Support listing and POSTing back Category entities (e.g. from inside an HtmlSelectOneMenu)
+     */
 
     public List<Category> getPageItems() {
-        return this.pageItems;
+        return pageItems;
     }
 
     public long getCount() {
-        return this.count;
+        return count;
     }
 
     public List<Category> getAll() {
 
-        CriteriaQuery<Category> criteria = this.entityManager
-                .getCriteriaBuilder().createQuery(Category.class);
-        return this.entityManager.createQuery(
-                criteria.select(criteria.from(Category.class))).getResultList();
+        final CriteriaQuery<Category> criteria = entityManager.getCriteriaBuilder().createQuery(Category.class);
+        return entityManager.createQuery(criteria.select(criteria.from(Category.class))).getResultList();
     }
 
-   /*
-    * Support adding children to bidirectional, one-to-many tables
-    */
+    /*
+     * Support adding children to bidirectional, one-to-many tables
+     */
 
     public Converter getConverter() {
 
-        final CategoryBean ejbProxy = this.sessionContext
-                .getBusinessObject(CategoryBean.class);
+        final CategoryBean ejbProxy = sessionContext.getBusinessObject(CategoryBean.class);
 
         return new Converter() {
 
             @Override
-            public Object getAsObject(FacesContext context,
-                                      UIComponent component, String value) {
+            public Object getAsObject(final FacesContext context, final UIComponent component, final String value) {
 
                 return ejbProxy.findById(Long.valueOf(value));
             }
 
             @Override
-            public String getAsString(FacesContext context,
-                                      UIComponent component, Object value) {
+            public String getAsString(final FacesContext context, final UIComponent component, final Object value) {
 
                 if (value == null) {
                     return "";
@@ -264,12 +252,12 @@ public class CategoryBean implements Serializable {
     }
 
     public Category getAdd() {
-        return this.add;
+        return add;
     }
 
     public Category getAdded() {
-        Category added = this.add;
-        this.add = new Category();
+        final Category added = add;
+        add = new Category();
         return added;
     }
 }

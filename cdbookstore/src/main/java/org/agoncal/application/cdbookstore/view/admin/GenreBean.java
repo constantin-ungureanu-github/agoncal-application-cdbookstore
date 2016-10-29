@@ -1,7 +1,8 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
-import org.agoncal.application.cdbookstore.model.Genre;
-import org.agoncal.application.cdbookstore.util.Loggable;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
@@ -22,16 +23,16 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.agoncal.application.cdbookstore.model.Genre;
+import org.agoncal.application.cdbookstore.util.Loggable;
 
 /**
  * Backing bean for Genre entities.
  * <p/>
- * This class provides CRUD functionality for all Genre entities. It focuses purely on Java EE 6 standards (e.g.
- * <tt>&#64;ConversationScoped</tt> for state management, <tt>PersistenceContext</tt> for persistence,
- * <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base class.
+ * This class provides CRUD functionality for all Genre entities. It focuses purely on Java EE 6 standards (e.g. <tt>&#64;ConversationScoped</tt> for state
+ * management, <tt>PersistenceContext</tt> for persistence, <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base
+ * class.
  */
 
 @Named
@@ -39,13 +40,7 @@ import java.util.List;
 @ConversationScoped
 @Loggable
 public class GenreBean implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-   /*
-    * Support creating and retrieving Genre entities
-    */
-
+    private static final long serialVersionUID = 8606214696220974612L;
     private Long id;
     private Genre genre;
     @Inject
@@ -61,33 +56,33 @@ public class GenreBean implements Serializable {
     private Genre add = new Genre();
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-   /*
-    * Support updating and deleting Genre entities
-    */
+    /*
+     * Support updating and deleting Genre entities
+     */
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
     public Genre getGenre() {
-        return this.genre;
+        return genre;
     }
 
-   /*
-    * Support searching Genre entities with pagination
-    */
+    /*
+     * Support searching Genre entities with pagination
+     */
 
-    public void setGenre(Genre genre) {
+    public void setGenre(final Genre genre) {
         this.genre = genre;
     }
 
     public String create() {
 
-        this.conversation.begin();
-        this.conversation.setTimeout(1800000L);
+        conversation.begin();
+        conversation.setTimeout(1800000L);
         return "create?faces-redirect=true";
     }
 
@@ -97,62 +92,60 @@ public class GenreBean implements Serializable {
             return;
         }
 
-        if (this.conversation.isTransient()) {
-            this.conversation.begin();
-            this.conversation.setTimeout(1800000L);
+        if (conversation.isTransient()) {
+            conversation.begin();
+            conversation.setTimeout(1800000L);
         }
 
-        if (this.id == null) {
-            this.genre = this.example;
+        if (id == null) {
+            genre = example;
         } else {
-            this.genre = findById(getId());
+            genre = findById(getId());
         }
     }
 
-    public Genre findById(Long id) {
+    public Genre findById(final Long id) {
 
-        return this.entityManager.find(Genre.class, id);
+        return entityManager.find(Genre.class, id);
     }
 
     public String update() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            if (this.id == null) {
-                this.entityManager.persist(this.genre);
+            if (id == null) {
+                entityManager.persist(genre);
                 return "search?faces-redirect=true";
             } else {
-                this.entityManager.merge(this.genre);
-                return "view?faces-redirect=true&id=" + this.genre.getId();
+                entityManager.merge(genre);
+                return "view?faces-redirect=true&id=" + genre.getId();
             }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public String delete() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            Genre deletableEntity = findById(getId());
+            final Genre deletableEntity = findById(getId());
 
-            this.entityManager.remove(deletableEntity);
-            this.entityManager.flush();
+            entityManager.remove(deletableEntity);
+            entityManager.flush();
             return "search?faces-redirect=true";
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public int getPage() {
-        return this.page;
+        return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         this.page = page;
     }
 
@@ -161,98 +154,87 @@ public class GenreBean implements Serializable {
     }
 
     public Genre getExample() {
-        return this.example;
+        return example;
     }
 
-    public void setExample(Genre example) {
+    public void setExample(final Genre example) {
         this.example = example;
     }
 
     public String search() {
-        this.page = 0;
+        page = 0;
         return null;
     }
 
     public void paginate() {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         // Populate this.count
 
         CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
         Root<Genre> root = countCriteria.from(Genre.class);
-        countCriteria = countCriteria.select(builder.count(root)).where(
-                getSearchPredicates(root));
-        this.count = this.entityManager.createQuery(countCriteria)
-                .getSingleResult();
+        countCriteria = countCriteria.select(builder.count(root)).where(getSearchPredicates(root));
+        count = entityManager.createQuery(countCriteria).getSingleResult();
 
         // Populate this.pageItems
 
-        CriteriaQuery<Genre> criteria = builder.createQuery(Genre.class);
+        final CriteriaQuery<Genre> criteria = builder.createQuery(Genre.class);
         root = criteria.from(Genre.class);
-        TypedQuery<Genre> query = this.entityManager.createQuery(criteria
-                .select(root).where(getSearchPredicates(root)));
-        query.setFirstResult(this.page * getPageSize()).setMaxResults(
-                getPageSize());
-        this.pageItems = query.getResultList();
+        final TypedQuery<Genre> query = entityManager.createQuery(criteria.select(root).where(getSearchPredicates(root)));
+        query.setFirstResult(page * getPageSize()).setMaxResults(getPageSize());
+        pageItems = query.getResultList();
     }
 
-    private Predicate[] getSearchPredicates(Root<Genre> root) {
+    private Predicate[] getSearchPredicates(final Root<Genre> root) {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-        List<Predicate> predicatesList = new ArrayList<>();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final List<Predicate> predicatesList = new ArrayList<>();
 
-        String name = this.example.getName();
-        if (name != null && !"".equals(name)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("name")),
-                    '%' + name.toLowerCase() + '%'));
+        final String name = example.getName();
+        if ((name != null) && !"".equals(name)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("name")), '%' + name.toLowerCase() + '%'));
         }
 
         return predicatesList.toArray(new Predicate[predicatesList.size()]);
     }
 
-   /*
-    * Support listing and POSTing back Genre entities (e.g. from inside an HtmlSelectOneMenu)
-    */
+    /*
+     * Support listing and POSTing back Genre entities (e.g. from inside an HtmlSelectOneMenu)
+     */
 
     public List<Genre> getPageItems() {
-        return this.pageItems;
+        return pageItems;
     }
 
     public long getCount() {
-        return this.count;
+        return count;
     }
 
     public List<Genre> getAll() {
 
-        CriteriaQuery<Genre> criteria = this.entityManager.getCriteriaBuilder()
-                .createQuery(Genre.class);
-        return this.entityManager.createQuery(
-                criteria.select(criteria.from(Genre.class))).getResultList();
+        final CriteriaQuery<Genre> criteria = entityManager.getCriteriaBuilder().createQuery(Genre.class);
+        return entityManager.createQuery(criteria.select(criteria.from(Genre.class))).getResultList();
     }
 
-   /*
-    * Support adding children to bidirectional, one-to-many tables
-    */
+    /*
+     * Support adding children to bidirectional, one-to-many tables
+     */
 
     public Converter getConverter() {
 
-        final GenreBean ejbProxy = this.sessionContext
-                .getBusinessObject(GenreBean.class);
+        final GenreBean ejbProxy = sessionContext.getBusinessObject(GenreBean.class);
 
         return new Converter() {
 
             @Override
-            public Object getAsObject(FacesContext context,
-                                      UIComponent component, String value) {
+            public Object getAsObject(final FacesContext context, final UIComponent component, final String value) {
 
                 return ejbProxy.findById(Long.valueOf(value));
             }
 
             @Override
-            public String getAsString(FacesContext context,
-                                      UIComponent component, Object value) {
+            public String getAsString(final FacesContext context, final UIComponent component, final Object value) {
 
                 if (value == null) {
                     return "";
@@ -264,12 +246,12 @@ public class GenreBean implements Serializable {
     }
 
     public Genre getAdd() {
-        return this.add;
+        return add;
     }
 
     public Genre getAdded() {
-        Genre added = this.add;
-        this.add = new Genre();
+        final Genre added = add;
+        add = new Genre();
         return added;
     }
 }

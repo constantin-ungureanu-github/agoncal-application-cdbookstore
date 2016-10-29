@@ -2,20 +2,12 @@ package org.agoncal.application.cdbookstore.util;
 
 import java.util.Random;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
-
 @EightDigits
 public class IssnGenerator implements NumberGenerator {
+    private static final long serialVersionUID = 1L;
 
-    // ======================================
-    // =          Business methods          =
-    // ======================================
-
+    @Override
     public String generateNumber() {
-        return "8-" + new Random().nextInt() / 1000;
+        return "8-" + (new Random().nextInt() / 1000);
     }
 }

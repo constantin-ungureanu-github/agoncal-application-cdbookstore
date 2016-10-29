@@ -1,7 +1,8 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
-import org.agoncal.application.cdbookstore.model.Label;
-import org.agoncal.application.cdbookstore.util.Loggable;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
@@ -22,16 +23,16 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.agoncal.application.cdbookstore.model.Label;
+import org.agoncal.application.cdbookstore.util.Loggable;
 
 /**
  * Backing bean for Label entities.
  * <p/>
- * This class provides CRUD functionality for all Label entities. It focuses purely on Java EE 6 standards (e.g.
- * <tt>&#64;ConversationScoped</tt> for state management, <tt>PersistenceContext</tt> for persistence,
- * <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base class.
+ * This class provides CRUD functionality for all Label entities. It focuses purely on Java EE 6 standards (e.g. <tt>&#64;ConversationScoped</tt> for state
+ * management, <tt>PersistenceContext</tt> for persistence, <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base
+ * class.
  */
 
 @Named
@@ -41,10 +42,6 @@ import java.util.List;
 public class LabelBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-   /*
-    * Support creating and retrieving Label entities
-    */
 
     private Long id;
     private Label label;
@@ -61,98 +58,85 @@ public class LabelBean implements Serializable {
     private Label add = new Label();
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-   /*
-    * Support updating and deleting Label entities
-    */
-
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
     public Label getLabel() {
-        return this.label;
+        return label;
     }
 
-   /*
-    * Support searching Label entities with pagination
-    */
-
-    public void setLabel(Label label) {
+    public void setLabel(final Label label) {
         this.label = label;
     }
 
     public String create() {
-
-        this.conversation.begin();
-        this.conversation.setTimeout(1800000L);
+        conversation.begin();
+        conversation.setTimeout(1800000L);
         return "create?faces-redirect=true";
     }
 
     public void retrieve() {
-
         if (FacesContext.getCurrentInstance().isPostback()) {
             return;
         }
 
-        if (this.conversation.isTransient()) {
-            this.conversation.begin();
-            this.conversation.setTimeout(1800000L);
+        if (conversation.isTransient()) {
+            conversation.begin();
+            conversation.setTimeout(1800000L);
         }
 
-        if (this.id == null) {
-            this.label = this.example;
+        if (id == null) {
+            label = example;
         } else {
-            this.label = findById(getId());
+            label = findById(getId());
         }
     }
 
-    public Label findById(Long id) {
-
-        return this.entityManager.find(Label.class, id);
+    public Label findById(final Long id) {
+        return entityManager.find(Label.class, id);
     }
 
     public String update() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            if (this.id == null) {
-                this.entityManager.persist(this.label);
+            if (id == null) {
+                entityManager.persist(label);
                 return "search?faces-redirect=true";
             } else {
-                this.entityManager.merge(this.label);
-                return "view?faces-redirect=true&id=" + this.label.getId();
+                entityManager.merge(label);
+                return "view?faces-redirect=true&id=" + label.getId();
             }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public String delete() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            Label deletableEntity = findById(getId());
+            final Label deletableEntity = findById(getId());
 
-            this.entityManager.remove(deletableEntity);
-            this.entityManager.flush();
+            entityManager.remove(deletableEntity);
+            entityManager.flush();
             return "search?faces-redirect=true";
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public int getPage() {
-        return this.page;
+        return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         this.page = page;
     }
 
@@ -161,99 +145,72 @@ public class LabelBean implements Serializable {
     }
 
     public Label getExample() {
-        return this.example;
+        return example;
     }
 
-    public void setExample(Label example) {
+    public void setExample(final Label example) {
         this.example = example;
     }
 
     public String search() {
-        this.page = 0;
+        page = 0;
         return null;
     }
 
     public void paginate() {
-
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-
-        // Populate this.count
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
         Root<Label> root = countCriteria.from(Label.class);
-        countCriteria = countCriteria.select(builder.count(root)).where(
-                getSearchPredicates(root));
-        this.count = this.entityManager.createQuery(countCriteria)
-                .getSingleResult();
+        countCriteria = countCriteria.select(builder.count(root)).where(getSearchPredicates(root));
+        count = entityManager.createQuery(countCriteria).getSingleResult();
 
-        // Populate this.pageItems
-
-        CriteriaQuery<Label> criteria = builder.createQuery(Label.class);
+        final CriteriaQuery<Label> criteria = builder.createQuery(Label.class);
         root = criteria.from(Label.class);
-        TypedQuery<Label> query = this.entityManager.createQuery(criteria
-                .select(root).where(getSearchPredicates(root)));
-        query.setFirstResult(this.page * getPageSize()).setMaxResults(
-                getPageSize());
-        this.pageItems = query.getResultList();
+        final TypedQuery<Label> query = entityManager.createQuery(criteria.select(root).where(getSearchPredicates(root)));
+        query.setFirstResult(page * getPageSize()).setMaxResults(getPageSize());
+        pageItems = query.getResultList();
     }
 
-    private Predicate[] getSearchPredicates(Root<Label> root) {
+    private Predicate[] getSearchPredicates(final Root<Label> root) {
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final List<Predicate> predicatesList = new ArrayList<>();
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-        List<Predicate> predicatesList = new ArrayList<>();
-
-        String name = this.example.getName();
-        if (name != null && !"".equals(name)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("name")),
-                    '%' + name.toLowerCase() + '%'));
+        final String name = example.getName();
+        if ((name != null) && !"".equals(name)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("name")), '%' + name.toLowerCase() + '%'));
         }
 
         return predicatesList.toArray(new Predicate[predicatesList.size()]);
     }
 
-   /*
-    * Support listing and POSTing back Label entities (e.g. from inside an HtmlSelectOneMenu)
-    */
-
     public List<Label> getPageItems() {
-        return this.pageItems;
+        return pageItems;
     }
 
     public long getCount() {
-        return this.count;
+        return count;
     }
 
     public List<Label> getAll() {
 
-        CriteriaQuery<Label> criteria = this.entityManager.getCriteriaBuilder()
-                .createQuery(Label.class);
-        return this.entityManager.createQuery(
-                criteria.select(criteria.from(Label.class))).getResultList();
+        final CriteriaQuery<Label> criteria = entityManager.getCriteriaBuilder().createQuery(Label.class);
+        return entityManager.createQuery(criteria.select(criteria.from(Label.class))).getResultList();
     }
 
-   /*
-    * Support adding children to bidirectional, one-to-many tables
-    */
-
     public Converter getConverter() {
-
-        final LabelBean ejbProxy = this.sessionContext
-                .getBusinessObject(LabelBean.class);
+        final LabelBean ejbProxy = sessionContext.getBusinessObject(LabelBean.class);
 
         return new Converter() {
 
             @Override
-            public Object getAsObject(FacesContext context,
-                                      UIComponent component, String value) {
+            public Object getAsObject(final FacesContext context, final UIComponent component, final String value) {
 
                 return ejbProxy.findById(Long.valueOf(value));
             }
 
             @Override
-            public String getAsString(FacesContext context,
-                                      UIComponent component, Object value) {
-
+            public String getAsString(final FacesContext context, final UIComponent component, final Object value) {
                 if (value == null) {
                     return "";
                 }
@@ -264,12 +221,12 @@ public class LabelBean implements Serializable {
     }
 
     public Label getAdd() {
-        return this.add;
+        return add;
     }
 
     public Label getAdded() {
-        Label added = this.add;
-        this.add = new Label();
+        final Label added = add;
+        add = new Label();
         return added;
     }
 }

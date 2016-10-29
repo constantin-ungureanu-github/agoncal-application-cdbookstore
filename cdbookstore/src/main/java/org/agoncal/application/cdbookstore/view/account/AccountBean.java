@@ -1,10 +1,7 @@
 package org.agoncal.application.cdbookstore.view.account;
 
-import com.thedeanda.lorem.LoremIpsum;
-import org.agoncal.application.cdbookstore.model.User;
-import org.agoncal.application.cdbookstore.model.UserRole;
-import org.agoncal.application.cdbookstore.util.PasswordUtils;
-import org.agoncal.application.cdbookstore.view.shopping.ShoppingCartBean;
+import java.io.Serializable;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
@@ -22,17 +19,19 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import java.io.Serializable;
-import java.util.UUID;
+
+import org.agoncal.application.cdbookstore.model.User;
+import org.agoncal.application.cdbookstore.util.PasswordUtils;
+import org.agoncal.application.cdbookstore.util.UserRole;
+import org.agoncal.application.cdbookstore.view.shopping.ShoppingCartBean;
+
+import com.thedeanda.lorem.LoremIpsum;
 
 @Named
 @SessionScoped
 @Transactional
 public class AccountBean implements Serializable {
-
-    // ======================================
-    // =          Injection Points          =
-    // ======================================
+    private static final long serialVersionUID = 226667233642005149L;
 
     @Inject
     private BeanManager beanManager;
@@ -47,20 +46,11 @@ public class AccountBean implements Serializable {
     private HttpServletRequest request;
 
     @Inject
-    private EntityManager em;
-
-    // ======================================
-    // =             Constants              =
-    // ======================================
+    private EntityManager entityManager;
 
     private static final String COOKIE_NAME = "applicationCDBookStoreCookie";
     private static final int COOKIE_AGE = 60; // Expires after 60 seconds or even 2_592_000 for one month
 
-    // ======================================
-    // =             Attributes             =
-    // ======================================
-
-    // Logged user
     private User user = new User();
     private boolean loggedIn;
     private boolean admin;
@@ -68,73 +58,64 @@ public class AccountBean implements Serializable {
     private String password2;
     private boolean rememberMe;
 
-    // ======================================
-    // =         Lifecycle methods          =
-    // ======================================
-
     @PostConstruct
     private void checkIfUserHasRememberMeCookie() {
-        String coockieValue = getCookieValue();
-        if (coockieValue == null)
+        final String coockieValue = getCookieValue();
+        if (coockieValue == null) {
             return;
+        }
 
-        TypedQuery<User> query = em.createNamedQuery(User.FIND_BY_UUID, User.class);
+        final TypedQuery<User> query = entityManager.createNamedQuery(User.FIND_BY_UUID, User.class);
         query.setParameter("uuid", coockieValue);
         try {
             user = query.getSingleResult();
             // If the user is an administrator
-            if (user.getRole().equals(UserRole.ADMIN))
+            if (user.getRole().equals(UserRole.ADMIN)) {
                 admin = true;
+            }
             // The user is now logged in
             loggedIn = true;
-        } catch (NoResultException e) {
+        } catch (final NoResultException e) {
             // The user maybe has an old coockie, let's get rid of it
             removeCookie();
         }
     }
 
-    // ======================================
-    // =          Business methods          =
-    // ======================================
-
     @Transactional(dontRollbackOn = IllegalArgumentException.class)
     public String doSignup() {
         // Does the login already exists ?
-        if (em.createNamedQuery(User.FIND_BY_LOGIN, User.class).setParameter("login", user.getLogin())
-                .getResultList().size() > 0) {
+        if (entityManager.createNamedQuery(User.FIND_BY_LOGIN, User.class).setParameter("login", user.getLogin()).getResultList().size() > 0) {
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Login already exists " + user.getLogin(),
-                            "You must choose a different login"));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Login already exists " + user.getLogin(), "You must choose a different login"));
             return null;
         }
 
         // Everything is ok, we can create the user
         user.setPassword(password1);
-        em.persist(user);
-        // if (user.getEmail().contains("antonio"))
-        //     throw new IllegalArgumentException("Wrong email");
+        entityManager.persist(user);
 
         resetPasswords();
-        facesContext.addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Hi " + user.getFirstName(), "Welcome to this website"));
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Hi " + user.getFirstName(), "Welcome to this website"));
         loggedIn = true;
-        if (user.getRole().equals(UserRole.ADMIN))
+        if (user.getRole().equals(UserRole.ADMIN)) {
             admin = true;
+        }
         return "/main";
     }
 
     public String doSignin() {
-        TypedQuery<User> query = em.createNamedQuery(User.FIND_BY_LOGIN_PASSWORD, User.class);
+        final TypedQuery<User> query = entityManager.createNamedQuery(User.FIND_BY_LOGIN_PASSWORD, User.class);
         query.setParameter("login", user.getLogin());
         query.setParameter("password", PasswordUtils.digestPassword(user.getPassword()));
         try {
             user = query.getSingleResult();
             // If the user is an administrator
-            if (user.getRole().equals(UserRole.ADMIN))
+            if (user.getRole().equals(UserRole.ADMIN)) {
                 admin = true;
+            }
             // If the user has clicked on remember me
             if (rememberMe) {
-                String uuid = UUID.randomUUID().toString();
+                final String uuid = UUID.randomUUID().toString();
                 user.setUuid(uuid);
                 addCookie(uuid);
             } else {
@@ -143,18 +124,17 @@ public class AccountBean implements Serializable {
             }
             // The user is now logged in
             loggedIn = true;
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Welcome back " + user.getFirstName(),
-                    "You can now browse the catalog"));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Welcome back " + user.getFirstName(), "You can now browse the catalog"));
             return "/main";
-        } catch (NoResultException e) {
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Wrong user/password",
-                    "Check your inputs or ask for a new password"));
+        } catch (final NoResultException e) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Wrong user/password", "Check your inputs or ask for a new password"));
             return null;
         }
     }
 
     public String doLogout() {
-        AlterableContext ctx = (AlterableContext) beanManager.getContext(SessionScoped.class);
+        final AlterableContext ctx = (AlterableContext) beanManager.getContext(SessionScoped.class);
         Bean<?> myBean = beanManager.getBeans(AccountBean.class).iterator().next();
         ctx.destroy(myBean);
         myBean = beanManager.getBeans(ShoppingCartBean.class).iterator().next();
@@ -165,8 +145,8 @@ public class AccountBean implements Serializable {
     public String doLogoutAndRemoveCookie() {
         removeCookie();
         user.setUuid(null);
-        em.merge(user);
-        AlterableContext ctx = (AlterableContext) beanManager.getContext(SessionScoped.class);
+        entityManager.merge(user);
+        final AlterableContext ctx = (AlterableContext) beanManager.getContext(SessionScoped.class);
         Bean<?> myBean = beanManager.getBeans(AccountBean.class).iterator().next();
         ctx.destroy(myBean);
         myBean = beanManager.getBeans(ShoppingCartBean.class).iterator().next();
@@ -175,40 +155,38 @@ public class AccountBean implements Serializable {
     }
 
     public String doForgotPassword() {
-        TypedQuery<User> query = em.createNamedQuery(User.FIND_BY_EMAIL, User.class);
+        final TypedQuery<User> query = entityManager.createNamedQuery(User.FIND_BY_EMAIL, User.class);
         query.setParameter("email", user.getEmail());
         try {
             user = query.getSingleResult();
-            String temporaryPassword = LoremIpsum.getInstance().getWords(1);
+            final String temporaryPassword = LoremIpsum.getInstance().getWords(1);
             user.setPassword(PasswordUtils.digestPassword(temporaryPassword));
-            em.merge(user);
+            entityManager.merge(user);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Email sent",
                     "An email has been sent to " + user.getEmail() + " with temporary password :" + temporaryPassword));
             // send an email with the password "dummyPassword"
             return doLogout();
-        } catch (NoResultException e) {
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Unknown email",
-                    "This email address is unknonw in our system"));
+        } catch (final NoResultException e) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Unknown email", "This email address is unknonw in our system"));
             return null;
         }
     }
 
     public String doUpdateProfile() {
-        if (password1 != null && !password1.isEmpty())
+        if ((password1 != null) && !password1.isEmpty()) {
             user.setPassword(PasswordUtils.digestPassword(password1));
-        em.merge(user);
+        }
+        entityManager.merge(user);
         resetPasswords();
-        facesContext.addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Profile has been updated for " + user.getFirstName(),
-                        null));
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Profile has been updated for " + user.getFirstName(), null));
         return null;
     }
 
     // Cookie
     private String getCookieValue() {
-        Cookie[] cookies = request.getCookies();
+        final Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            for (Cookie cookie : cookies) {
+            for (final Cookie cookie : cookies) {
                 if (COOKIE_NAME.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
@@ -217,15 +195,15 @@ public class AccountBean implements Serializable {
         return null;
     }
 
-    private void addCookie(String value) {
-        Cookie cookie = new Cookie(COOKIE_NAME, value);
+    private void addCookie(final String value) {
+        final Cookie cookie = new Cookie(COOKIE_NAME, value);
         cookie.setPath("/sampleJSFLogin");
         cookie.setMaxAge(COOKIE_AGE);
         response.addCookie(cookie);
     }
 
     private void removeCookie() {
-        Cookie cookie = new Cookie(COOKIE_NAME, null);
+        final Cookie cookie = new Cookie(COOKIE_NAME, null);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
@@ -235,15 +213,11 @@ public class AccountBean implements Serializable {
         password2 = null;
     }
 
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
-
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(final User user) {
         this.user = user;
     }
 
@@ -251,7 +225,7 @@ public class AccountBean implements Serializable {
         return loggedIn;
     }
 
-    public void setLoggedIn(boolean loggedIn) {
+    public void setLoggedIn(final boolean loggedIn) {
         this.loggedIn = loggedIn;
     }
 
@@ -259,7 +233,7 @@ public class AccountBean implements Serializable {
         return admin;
     }
 
-    public void setAdmin(boolean admin) {
+    public void setAdmin(final boolean admin) {
         this.admin = admin;
     }
 
@@ -267,7 +241,7 @@ public class AccountBean implements Serializable {
         return rememberMe;
     }
 
-    public void setRememberMe(boolean rememberMe) {
+    public void setRememberMe(final boolean rememberMe) {
         this.rememberMe = rememberMe;
     }
 
@@ -275,7 +249,7 @@ public class AccountBean implements Serializable {
         return password1;
     }
 
-    public void setPassword1(String password1) {
+    public void setPassword1(final String password1) {
         this.password1 = password1;
     }
 
@@ -283,7 +257,7 @@ public class AccountBean implements Serializable {
         return password2;
     }
 
-    public void setPassword2(String password2) {
+    public void setPassword2(final String password2) {
         this.password2 = password2;
     }
 

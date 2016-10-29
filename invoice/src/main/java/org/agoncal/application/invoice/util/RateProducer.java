@@ -3,15 +3,13 @@ package org.agoncal.application.invoice.util;
 import javax.enterprise.inject.Produces;
 
 /**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
+ * @author Antonio Goncalves http://www.antoniogoncalves.org --
  */
 
 public class RateProducer {
 
     // ======================================
-    // =              Producers             =
+    // = Producers =
     // ======================================
 
     @Produces

@@ -2,19 +2,11 @@ package org.agoncal.application.cdbookstore.util;
 
 import java.util.Random;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
-
 @ThirteenDigits
 public class IsbnGenerator implements NumberGenerator {
+    private static final long serialVersionUID = 1L;
 
-    // ======================================
-    // =          Business methods          =
-    // ======================================
-
+    @Override
     public String generateNumber() {
         return "13-" + new Random().nextInt();
     }

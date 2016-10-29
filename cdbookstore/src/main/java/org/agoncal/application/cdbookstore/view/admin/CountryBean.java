@@ -1,7 +1,8 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
-import org.agoncal.application.cdbookstore.model.Country;
-import org.agoncal.application.cdbookstore.util.Loggable;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
@@ -22,16 +23,16 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.agoncal.application.cdbookstore.model.Country;
+import org.agoncal.application.cdbookstore.util.Loggable;
 
 /**
  * Backing bean for Country entities.
  * <p/>
- * This class provides CRUD functionality for all Country entities. It focuses purely on Java EE 6 standards (e.g.
- * <tt>&#64;ConversationScoped</tt> for state management, <tt>PersistenceContext</tt> for persistence,
- * <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base class.
+ * This class provides CRUD functionality for all Country entities. It focuses purely on Java EE 6 standards (e.g. <tt>&#64;ConversationScoped</tt> for state
+ * management, <tt>PersistenceContext</tt> for persistence, <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base
+ * class.
  */
 
 @Named
@@ -42,9 +43,9 @@ public class CountryBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-   /*
-    * Support creating and retrieving Country entities
-    */
+    /*
+     * Support creating and retrieving Country entities
+     */
 
     private Long id;
     private Country country;
@@ -61,33 +62,33 @@ public class CountryBean implements Serializable {
     private Country add = new Country();
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-   /*
-    * Support updating and deleting Country entities
-    */
+    /*
+     * Support updating and deleting Country entities
+     */
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
     public Country getCountry() {
-        return this.country;
+        return country;
     }
 
-   /*
-    * Support searching Country entities with pagination
-    */
+    /*
+     * Support searching Country entities with pagination
+     */
 
-    public void setCountry(Country country) {
+    public void setCountry(final Country country) {
         this.country = country;
     }
 
     public String create() {
 
-        this.conversation.begin();
-        this.conversation.setTimeout(1800000L);
+        conversation.begin();
+        conversation.setTimeout(1800000L);
         return "create?faces-redirect=true";
     }
 
@@ -97,62 +98,60 @@ public class CountryBean implements Serializable {
             return;
         }
 
-        if (this.conversation.isTransient()) {
-            this.conversation.begin();
-            this.conversation.setTimeout(1800000L);
+        if (conversation.isTransient()) {
+            conversation.begin();
+            conversation.setTimeout(1800000L);
         }
 
-        if (this.id == null) {
-            this.country = this.example;
+        if (id == null) {
+            country = example;
         } else {
-            this.country = findById(getId());
+            country = findById(getId());
         }
     }
 
-    public Country findById(Long id) {
+    public Country findById(final Long id) {
 
-        return this.entityManager.find(Country.class, id);
+        return entityManager.find(Country.class, id);
     }
 
     public String update() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            if (this.id == null) {
-                this.entityManager.persist(this.country);
+            if (id == null) {
+                entityManager.persist(country);
                 return "search?faces-redirect=true";
             } else {
-                this.entityManager.merge(this.country);
-                return "view?faces-redirect=true&id=" + this.country.getId();
+                entityManager.merge(country);
+                return "view?faces-redirect=true&id=" + country.getId();
             }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public String delete() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            Country deletableEntity = findById(getId());
+            final Country deletableEntity = findById(getId());
 
-            this.entityManager.remove(deletableEntity);
-            this.entityManager.flush();
+            entityManager.remove(deletableEntity);
+            entityManager.flush();
             return "search?faces-redirect=true";
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public int getPage() {
-        return this.page;
+        return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         this.page = page;
     }
 
@@ -161,122 +160,103 @@ public class CountryBean implements Serializable {
     }
 
     public Country getExample() {
-        return this.example;
+        return example;
     }
 
-    public void setExample(Country example) {
+    public void setExample(final Country example) {
         this.example = example;
     }
 
     public String search() {
-        this.page = 0;
+        page = 0;
         return null;
     }
 
     public void paginate() {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         // Populate this.count
 
         CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
         Root<Country> root = countCriteria.from(Country.class);
-        countCriteria = countCriteria.select(builder.count(root)).where(
-                getSearchPredicates(root));
-        this.count = this.entityManager.createQuery(countCriteria)
-                .getSingleResult();
+        countCriteria = countCriteria.select(builder.count(root)).where(getSearchPredicates(root));
+        count = entityManager.createQuery(countCriteria).getSingleResult();
 
         // Populate this.pageItems
 
-        CriteriaQuery<Country> criteria = builder.createQuery(Country.class);
+        final CriteriaQuery<Country> criteria = builder.createQuery(Country.class);
         root = criteria.from(Country.class);
-        TypedQuery<Country> query = this.entityManager.createQuery(criteria
-                .select(root).where(getSearchPredicates(root)));
-        query.setFirstResult(this.page * getPageSize()).setMaxResults(
-                getPageSize());
-        this.pageItems = query.getResultList();
+        final TypedQuery<Country> query = entityManager.createQuery(criteria.select(root).where(getSearchPredicates(root)));
+        query.setFirstResult(page * getPageSize()).setMaxResults(getPageSize());
+        pageItems = query.getResultList();
     }
 
-    private Predicate[] getSearchPredicates(Root<Country> root) {
+    private Predicate[] getSearchPredicates(final Root<Country> root) {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-        List<Predicate> predicatesList = new ArrayList<>();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final List<Predicate> predicatesList = new ArrayList<>();
 
-        String isoCode = this.example.getIsoCode();
-        if (isoCode != null && !"".equals(isoCode)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("isoCode")),
-                    '%' + isoCode.toLowerCase() + '%'));
+        final String isoCode = example.getIsoCode();
+        if ((isoCode != null) && !"".equals(isoCode)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("isoCode")), '%' + isoCode.toLowerCase() + '%'));
         }
-        String name = this.example.getName();
-        if (name != null && !"".equals(name)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("name")),
-                    '%' + name.toLowerCase() + '%'));
+        final String name = example.getName();
+        if ((name != null) && !"".equals(name)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("name")), '%' + name.toLowerCase() + '%'));
         }
-        String printableName = this.example.getPrintableName();
-        if (printableName != null && !"".equals(printableName)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("printableName")),
-                    '%' + printableName.toLowerCase() + '%'));
+        final String printableName = example.getPrintableName();
+        if ((printableName != null) && !"".equals(printableName)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("printableName")), '%' + printableName.toLowerCase() + '%'));
         }
-        String iso3 = this.example.getIso3();
-        if (iso3 != null && !"".equals(iso3)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("iso3")),
-                    '%' + iso3.toLowerCase() + '%'));
+        final String iso3 = example.getIso3();
+        if ((iso3 != null) && !"".equals(iso3)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("iso3")), '%' + iso3.toLowerCase() + '%'));
         }
-        String numcode = this.example.getNumcode();
-        if (numcode != null && !"".equals(numcode)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("numcode")),
-                    '%' + numcode.toLowerCase() + '%'));
+        final String numcode = example.getNumcode();
+        if ((numcode != null) && !"".equals(numcode)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("numcode")), '%' + numcode.toLowerCase() + '%'));
         }
 
         return predicatesList.toArray(new Predicate[predicatesList.size()]);
     }
 
-   /*
-    * Support listing and POSTing back Country entities (e.g. from inside an HtmlSelectOneMenu)
-    */
+    /*
+     * Support listing and POSTing back Country entities (e.g. from inside an HtmlSelectOneMenu)
+     */
 
     public List<Country> getPageItems() {
-        return this.pageItems;
+        return pageItems;
     }
 
     public long getCount() {
-        return this.count;
+        return count;
     }
 
     public List<Country> getAll() {
 
-        CriteriaQuery<Country> criteria = this.entityManager
-                .getCriteriaBuilder().createQuery(Country.class);
-        return this.entityManager.createQuery(
-                criteria.select(criteria.from(Country.class))).getResultList();
+        final CriteriaQuery<Country> criteria = entityManager.getCriteriaBuilder().createQuery(Country.class);
+        return entityManager.createQuery(criteria.select(criteria.from(Country.class))).getResultList();
     }
 
-   /*
-    * Support adding children to bidirectional, one-to-many tables
-    */
+    /*
+     * Support adding children to bidirectional, one-to-many tables
+     */
 
     public Converter getConverter() {
 
-        final CountryBean ejbProxy = this.sessionContext
-                .getBusinessObject(CountryBean.class);
+        final CountryBean ejbProxy = sessionContext.getBusinessObject(CountryBean.class);
 
         return new Converter() {
 
             @Override
-            public Object getAsObject(FacesContext context,
-                                      UIComponent component, String value) {
+            public Object getAsObject(final FacesContext context, final UIComponent component, final String value) {
 
                 return ejbProxy.findById(Long.valueOf(value));
             }
 
             @Override
-            public String getAsString(FacesContext context,
-                                      UIComponent component, Object value) {
+            public String getAsString(final FacesContext context, final UIComponent component, final Object value) {
 
                 if (value == null) {
                     return "";
@@ -288,12 +268,12 @@ public class CountryBean implements Serializable {
     }
 
     public Country getAdd() {
-        return this.add;
+        return add;
     }
 
     public Country getAdded() {
-        Country added = this.add;
-        this.add = new Country();
+        final Country added = add;
+        add = new Country();
         return added;
     }
 }

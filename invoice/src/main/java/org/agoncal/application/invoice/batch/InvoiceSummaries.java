@@ -1,45 +1,28 @@
 package org.agoncal.application.invoice.batch;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "invoiceSummary")
-@XmlType(propOrder = {"year", "invoiceSummaries"})
+@XmlType(propOrder = { "year", "invoiceSummaries" })
 @XmlSeeAlso(InvoiceSummary.class)
 public class InvoiceSummaries extends ArrayList<InvoiceSummary> {
-
-    // ======================================
-    // =             Attributes             =
-    // ======================================
-
+    private static final long serialVersionUID = 1L;
     private Integer year;
-
-    // ======================================
-    // =            Constructors            =
-    // ======================================
 
     public InvoiceSummaries() {
         super();
     }
 
-    public InvoiceSummaries(Collection<? extends InvoiceSummary> c) {
+    public InvoiceSummaries(final Collection<? extends InvoiceSummary> c) {
         super(c);
     }
-
-    // ======================================
-    // =          Getters & Setters         =
-    // ======================================
 
     @XmlElement(name = "invoiceSummaries")
     public List<InvoiceSummary> getInvoiceSummaries() {
@@ -50,7 +33,7 @@ public class InvoiceSummaries extends ArrayList<InvoiceSummary> {
         return year;
     }
 
-    public void setYear(Integer year) {
+    public void setYear(final Integer year) {
         this.year = year;
     }
 }

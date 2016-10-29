@@ -1,71 +1,36 @@
 package org.agoncal.application.cdbookstore.model;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+import org.agoncal.application.cdbookstore.util.CreditCardType;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@NoArgsConstructor
+@ToString
 public class CreditCard implements Serializable {
-
-    // ======================================
-    // =             Attributes             =
-    // ======================================
+    private static final long serialVersionUID = 1L;
 
     @NotNull
     @Size(min = 1, max = 30)
+    @Getter
+    @Setter
     private String creditCardNumber;
+
     @NotNull
+    @Getter
+    @Setter
     private CreditCardType creditCardType;
+
     @NotNull
     @Size(min = 1, max = 5)
+    @Getter
+    @Setter
     private String creditCardExpDate;
-
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
-
-    public String getCreditCardNumber() {
-        return creditCardNumber;
-    }
-
-    public void setCreditCardNumber(String creditCardNumber) {
-        this.creditCardNumber = creditCardNumber;
-    }
-
-    public CreditCardType getCreditCardType() {
-        return creditCardType;
-    }
-
-    public void setCreditCardType(CreditCardType creditCardType) {
-        this.creditCardType = creditCardType;
-    }
-
-    public String getCreditCardExpDate() {
-        return creditCardExpDate;
-    }
-
-    public void setCreditCardExpDate(String creditCardExpDate) {
-        this.creditCardExpDate = creditCardExpDate;
-    }
-
-    // ======================================
-    // =   Methods hash, equals, toString   =
-    // ======================================
-
-    @Override
-    public String toString() {
-        String result = getClass().getSimpleName() + " ";
-        if (creditCardNumber != null && !creditCardNumber.trim().isEmpty())
-            result += "creditCardNumber: " + creditCardNumber;
-        if (creditCardType != null)
-            result += ", creditCardType: " + creditCardType;
-        if (creditCardExpDate != null && !creditCardExpDate.trim().isEmpty())
-            result += ", creditCardExpDate: " + creditCardExpDate;
-        return result;
-    }
 }

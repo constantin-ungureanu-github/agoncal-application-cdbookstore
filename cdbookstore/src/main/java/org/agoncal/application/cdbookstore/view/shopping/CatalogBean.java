@@ -1,7 +1,6 @@
 package org.agoncal.application.cdbookstore.view.shopping;
 
-import org.agoncal.application.cdbookstore.model.Item;
-import org.agoncal.application.cdbookstore.util.Auditable;
+import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
@@ -10,82 +9,49 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.List;
+
+import org.agoncal.application.cdbookstore.model.Item;
+import org.agoncal.application.cdbookstore.util.Auditable;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Named
 @RequestScoped
 @Transactional
 public class CatalogBean {
-
-    // ======================================
-    // =          Injection Points          =
-    // ======================================
-
     @Inject
     private FacesContext facesContext;
 
     @Inject
-    private EntityManager em;
+    private EntityManager entityManager;
 
-    // ======================================
-    // =             Attributes             =
-    // ======================================
-
+    @Getter
+    @Setter
     private String keyword;
-    private List<Item> items;
-    private Item item;
-    private Long itemId;
 
-    // ======================================
-    // =          Business methods          =
-    // ======================================
+    @Getter
+    @Setter
+    private List<Item> items;
+
+    @Getter
+    @Setter
+    private Item item;
+
+    @Getter
+    @Setter
+    private Long itemId;
 
     @Auditable
     public String doSearch() {
-        TypedQuery<Item> typedQuery = em.createNamedQuery(Item.SEARCH, Item.class);
+        final TypedQuery<Item> typedQuery = entityManager.createNamedQuery(Item.SEARCH, Item.class);
         typedQuery.setParameter("keyword", "%" + keyword.toUpperCase() + "%");
         items = typedQuery.getResultList();
         return null;
     }
 
     public String doViewItemById() {
-        item = em.find(Item.class, itemId);
+        item = entityManager.find(Item.class, itemId);
         return null;
-    }
-
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
-
-    public Long getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
     }
 }

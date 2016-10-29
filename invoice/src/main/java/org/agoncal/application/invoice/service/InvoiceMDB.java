@@ -1,32 +1,19 @@
 package org.agoncal.application.invoice.service;
 
-import org.agoncal.application.invoice.model.Invoice;
-
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.inject.Inject;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
+import org.agoncal.application.invoice.model.Invoice;
+import org.slf4j.Logger;
 
-@MessageDriven(mappedName = "invoiceQueue", activationConfig = {
-        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+@MessageDriven(mappedName = "invoiceQueue", activationConfig = { @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "jms/queue/invoiceQueue"),
-        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
-})
+        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"), })
 public class InvoiceMDB implements MessageListener {
-
-    // ======================================
-    // =          Injection Points          =
-    // ======================================
 
     @Inject
     private InvoiceService invoiceService;
@@ -34,19 +21,15 @@ public class InvoiceMDB implements MessageListener {
     @Inject
     private Logger logger;
 
-    // ======================================
-    // =          Business methods          =
-    // ======================================
-
     @Override
-    public void onMessage(Message message) {
+    public void onMessage(final Message message) {
         try {
             logger.info("Message received " + message);
-            Invoice invoice = message.getBody(Invoice.class);
+            final Invoice invoice = message.getBody(Invoice.class);
             invoiceService.persist(invoice);
             logger.info("Invoice persisted " + invoice);
-        } catch (JMSException e) {
-            logger.log(Level.SEVERE, "Cannot persist invoice", e);
+        } catch (final JMSException e) {
+            logger.error("Cannot persist invoice", e);
         }
     }
 }

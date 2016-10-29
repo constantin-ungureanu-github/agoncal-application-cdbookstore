@@ -1,9 +1,8 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
-import org.agoncal.application.cdbookstore.model.CD;
-import org.agoncal.application.cdbookstore.model.Genre;
-import org.agoncal.application.cdbookstore.model.Label;
-import org.agoncal.application.cdbookstore.util.Loggable;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
@@ -24,30 +23,25 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.agoncal.application.cdbookstore.model.CD;
+import org.agoncal.application.cdbookstore.model.Genre;
+import org.agoncal.application.cdbookstore.model.Label;
+import org.agoncal.application.cdbookstore.util.Loggable;
 
 /**
  * Backing bean for CD entities.
  * <p/>
- * This class provides CRUD functionality for all CD entities. It focuses purely on Java EE 6 standards (e.g.
- * <tt>&#64;ConversationScoped</tt> for state management, <tt>PersistenceContext</tt> for persistence,
- * <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base class.
+ * This class provides CRUD functionality for all CD entities. It focuses purely on Java EE 6 standards (e.g. <tt>&#64;ConversationScoped</tt> for state
+ * management, <tt>PersistenceContext</tt> for persistence, <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base
+ * class.
  */
-
 @Named("CDBean")
 @Stateful
 @ConversationScoped
 @Loggable
 public class CDBean implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-   /*
-    * Support creating and retrieving CD entities
-    */
-
+    private static final long serialVersionUID = -5675194999757434351L;
     private Long id;
     private CD CD;
     @Inject
@@ -63,33 +57,33 @@ public class CDBean implements Serializable {
     private CD add = new CD();
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-   /*
-    * Support updating and deleting CD entities
-    */
+    /*
+     * Support updating and deleting CD entities
+     */
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
     public CD getCD() {
-        return this.CD;
+        return CD;
     }
 
-   /*
-    * Support searching CD entities with pagination
-    */
+    /*
+     * Support searching CD entities with pagination
+     */
 
-    public void setCD(CD CD) {
+    public void setCD(final CD CD) {
         this.CD = CD;
     }
 
     public String create() {
 
-        this.conversation.begin();
-        this.conversation.setTimeout(1800000L);
+        conversation.begin();
+        conversation.setTimeout(1800000L);
         return "create?faces-redirect=true";
     }
 
@@ -99,62 +93,60 @@ public class CDBean implements Serializable {
             return;
         }
 
-        if (this.conversation.isTransient()) {
-            this.conversation.begin();
-            this.conversation.setTimeout(1800000L);
+        if (conversation.isTransient()) {
+            conversation.begin();
+            conversation.setTimeout(1800000L);
         }
 
-        if (this.id == null) {
-            this.CD = this.example;
+        if (id == null) {
+            CD = example;
         } else {
-            this.CD = findById(getId());
+            CD = findById(getId());
         }
     }
 
-    public CD findById(Long id) {
+    public CD findById(final Long id) {
 
-        return this.entityManager.find(CD.class, id);
+        return entityManager.find(CD.class, id);
     }
 
     public String update() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            if (this.id == null) {
-                this.entityManager.persist(this.CD);
+            if (id == null) {
+                entityManager.persist(CD);
                 return "search?faces-redirect=true";
             } else {
-                this.entityManager.merge(this.CD);
-                return "view?faces-redirect=true&id=" + this.CD.getId();
+                entityManager.merge(CD);
+                return "view?faces-redirect=true&id=" + CD.getId();
             }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public String delete() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            CD deletableEntity = findById(getId());
+            final CD deletableEntity = findById(getId());
 
-            this.entityManager.remove(deletableEntity);
-            this.entityManager.flush();
+            entityManager.remove(deletableEntity);
+            entityManager.flush();
             return "search?faces-redirect=true";
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public int getPage() {
-        return this.page;
+        return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         this.page = page;
     }
 
@@ -163,64 +155,56 @@ public class CDBean implements Serializable {
     }
 
     public CD getExample() {
-        return this.example;
+        return example;
     }
 
-    public void setExample(CD example) {
+    public void setExample(final CD example) {
         this.example = example;
     }
 
     public String search() {
-        this.page = 0;
+        page = 0;
         return null;
     }
 
     public void paginate() {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         // Populate this.count
 
         CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
         Root<CD> root = countCriteria.from(CD.class);
-        countCriteria = countCriteria.select(builder.count(root)).where(
-                getSearchPredicates(root));
-        this.count = this.entityManager.createQuery(countCriteria)
-                .getSingleResult();
+        countCriteria = countCriteria.select(builder.count(root)).where(getSearchPredicates(root));
+        count = entityManager.createQuery(countCriteria).getSingleResult();
 
         // Populate this.pageItems
 
-        CriteriaQuery<CD> criteria = builder.createQuery(CD.class);
+        final CriteriaQuery<CD> criteria = builder.createQuery(CD.class);
         root = criteria.from(CD.class);
-        TypedQuery<CD> query = this.entityManager.createQuery(criteria.select(
-                root).where(getSearchPredicates(root)));
-        query.setFirstResult(this.page * getPageSize()).setMaxResults(
-                getPageSize());
-        this.pageItems = query.getResultList();
+        final TypedQuery<CD> query = entityManager.createQuery(criteria.select(root).where(getSearchPredicates(root)));
+        query.setFirstResult(page * getPageSize()).setMaxResults(getPageSize());
+        pageItems = query.getResultList();
     }
 
-    private Predicate[] getSearchPredicates(Root<CD> root) {
+    private Predicate[] getSearchPredicates(final Root<CD> root) {
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-        List<Predicate> predicatesList = new ArrayList<>();
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final List<Predicate> predicatesList = new ArrayList<>();
 
-        String title = this.example.getTitle();
-        if (title != null && !"".equals(title)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("title")),
-                    '%' + title.toLowerCase() + '%'));
+        final String title = example.getTitle();
+        if ((title != null) && !"".equals(title)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("title")), '%' + title.toLowerCase() + '%'));
         }
-        String description = this.example.getDescription();
-        if (description != null && !"".equals(description)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("description")),
-                    '%' + description.toLowerCase() + '%'));
+        final String description = example.getDescription();
+        if ((description != null) && !"".equals(description)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("description")), '%' + description.toLowerCase() + '%'));
         }
-        Label label = this.example.getLabel();
+        final Label label = example.getLabel();
         if (label != null) {
             predicatesList.add(builder.equal(root.get("label"), label));
         }
-        Genre genre = this.example.getGenre();
+        final Genre genre = example.getGenre();
         if (genre != null) {
             predicatesList.add(builder.equal(root.get("genre"), genre));
         }
@@ -228,47 +212,42 @@ public class CDBean implements Serializable {
         return predicatesList.toArray(new Predicate[predicatesList.size()]);
     }
 
-   /*
-    * Support listing and POSTing back CD entities (e.g. from inside an HtmlSelectOneMenu)
-    */
+    /*
+     * Support listing and POSTing back CD entities (e.g. from inside an HtmlSelectOneMenu)
+     */
 
     public List<CD> getPageItems() {
-        return this.pageItems;
+        return pageItems;
     }
 
     public long getCount() {
-        return this.count;
+        return count;
     }
 
     public List<CD> getAll() {
 
-        CriteriaQuery<CD> criteria = this.entityManager.getCriteriaBuilder()
-                .createQuery(CD.class);
-        return this.entityManager.createQuery(
-                criteria.select(criteria.from(CD.class))).getResultList();
+        final CriteriaQuery<CD> criteria = entityManager.getCriteriaBuilder().createQuery(CD.class);
+        return entityManager.createQuery(criteria.select(criteria.from(CD.class))).getResultList();
     }
 
-   /*
-    * Support adding children to bidirectional, one-to-many tables
-    */
+    /*
+     * Support adding children to bidirectional, one-to-many tables
+     */
 
     public Converter getConverter() {
 
-        final CDBean ejbProxy = this.sessionContext
-                .getBusinessObject(CDBean.class);
+        final CDBean ejbProxy = sessionContext.getBusinessObject(CDBean.class);
 
         return new Converter() {
 
             @Override
-            public Object getAsObject(FacesContext context,
-                                      UIComponent component, String value) {
+            public Object getAsObject(final FacesContext context, final UIComponent component, final String value) {
 
                 return ejbProxy.findById(Long.valueOf(value));
             }
 
             @Override
-            public String getAsString(FacesContext context,
-                                      UIComponent component, Object value) {
+            public String getAsString(final FacesContext context, final UIComponent component, final Object value) {
 
                 if (value == null) {
                     return "";
@@ -280,12 +259,12 @@ public class CDBean implements Serializable {
     }
 
     public CD getAdd() {
-        return this.add;
+        return add;
     }
 
     public CD getAdded() {
-        CD added = this.add;
-        this.add = new CD();
+        final CD added = add;
+        add = new CD();
         return added;
     }
 }

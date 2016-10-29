@@ -1,10 +1,8 @@
 package org.agoncal.application.cdbookstore.view.admin;
 
-import org.agoncal.application.cdbookstore.model.Book;
-import org.agoncal.application.cdbookstore.model.Language;
-import org.agoncal.application.cdbookstore.util.Loggable;
-import org.agoncal.application.cdbookstore.util.NumberGenerator;
-import org.agoncal.application.cdbookstore.util.ThirteenDigits;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
@@ -25,16 +23,19 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.agoncal.application.cdbookstore.model.Book;
+import org.agoncal.application.cdbookstore.util.Language;
+import org.agoncal.application.cdbookstore.util.Loggable;
+import org.agoncal.application.cdbookstore.util.NumberGenerator;
+import org.agoncal.application.cdbookstore.util.ThirteenDigits;
 
 /**
  * Backing bean for Book entities.
  * <p/>
- * This class provides CRUD functionality for all Book entities. It focuses purely on Java EE 6 standards (e.g.
- * <tt>&#64;ConversationScoped</tt> for state management, <tt>PersistenceContext</tt> for persistence,
- * <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base class.
+ * This class provides CRUD functionality for all Book entities. It focuses purely on Java EE 6 standards (e.g. <tt>&#64;ConversationScoped</tt> for state
+ * management, <tt>PersistenceContext</tt> for persistence, <tt>CriteriaBuilder</tt> for searches) rather than introducing a CRUD framework or custom base
+ * class.
  */
 
 @Named
@@ -44,10 +45,6 @@ import java.util.List;
 public class BookBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-   /*
-    * Support creating and retrieving Book entities
-    */
 
     private Long id;
     private Book book;
@@ -66,62 +63,51 @@ public class BookBean implements Serializable {
     @ThirteenDigits
     private NumberGenerator generator;
 
-   /*
-    * Support updating and deleting Book entities
-    */
-
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-   /*
-    * Support searching Book entities with pagination
-    */
-
     public Book getBook() {
-        return this.book;
+        return book;
     }
 
-    public void setBook(Book book) {
+    public void setBook(final Book book) {
         this.book = book;
     }
 
     public String create() {
-
-        this.conversation.begin();
-        this.conversation.setTimeout(1800000L);
+        conversation.begin();
+        conversation.setTimeout(1800000L);
         return "create?faces-redirect=true";
     }
 
     public void retrieve() {
-
         if (FacesContext.getCurrentInstance().isPostback()) {
             return;
         }
 
-        if (this.conversation.isTransient()) {
-            this.conversation.begin();
-            this.conversation.setTimeout(1800000L);
+        if (conversation.isTransient()) {
+            conversation.begin();
+            conversation.setTimeout(1800000L);
         }
 
-        if (this.id == null) {
-            this.book = this.example;
+        if (id == null) {
+            book = example;
         } else {
-            this.book = findById(getId());
+            book = findById(getId());
         }
     }
 
-    public Book findById(Long id) {
-
-        return this.entityManager.find(Book.class, id);
+    public Book findById(final Long id) {
+        return entityManager.find(Book.class, id);
     }
 
     public String update() {
-        this.conversation.end();
+        conversation.end();
 
         try {
             if (id == null) {
@@ -132,33 +118,32 @@ public class BookBean implements Serializable {
                 entityManager.merge(book);
                 return "view?faces-redirect=true&id=" + book.getId();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public String delete() {
-        this.conversation.end();
+        conversation.end();
 
         try {
-            Book deletableEntity = findById(getId());
+            final Book deletableEntity = findById(getId());
 
-            this.entityManager.remove(deletableEntity);
-            this.entityManager.flush();
+            entityManager.remove(deletableEntity);
+            entityManager.flush();
             return "search?faces-redirect=true";
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(e.getMessage()));
+        } catch (final Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(e.getMessage()));
             return null;
         }
     }
 
     public int getPage() {
-        return this.page;
+        return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         this.page = page;
     }
 
@@ -167,70 +152,58 @@ public class BookBean implements Serializable {
     }
 
     public Book getExample() {
-        return this.example;
+        return example;
     }
 
-    public void setExample(Book example) {
+    public void setExample(final Book example) {
         this.example = example;
     }
 
     public String search() {
-        this.page = 0;
+        page = 0;
         return null;
     }
 
     public void paginate() {
-
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-
-        // Populate this.count
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Long> countCriteria = builder.createQuery(Long.class);
         Root<Book> root = countCriteria.from(Book.class);
-        countCriteria = countCriteria.select(builder.count(root)).where(
-                getSearchPredicates(root));
-        this.count = this.entityManager.createQuery(countCriteria)
-                .getSingleResult();
+        countCriteria = countCriteria.select(builder.count(root)).where(getSearchPredicates(root));
+        count = entityManager.createQuery(countCriteria).getSingleResult();
 
-        // Populate this.pageItems
-
-        CriteriaQuery<Book> criteria = builder.createQuery(Book.class);
+        final CriteriaQuery<Book> criteria = builder.createQuery(Book.class);
         root = criteria.from(Book.class);
-        TypedQuery<Book> query = this.entityManager.createQuery(criteria
-                .select(root).where(getSearchPredicates(root)));
-        query.setFirstResult(this.page * getPageSize()).setMaxResults(
-                getPageSize());
-        this.pageItems = query.getResultList();
+        final TypedQuery<Book> query = entityManager.createQuery(criteria.select(root).where(getSearchPredicates(root)));
+        query.setFirstResult(page * getPageSize()).setMaxResults(getPageSize());
+        pageItems = query.getResultList();
     }
 
-    private Predicate[] getSearchPredicates(Root<Book> root) {
+    private Predicate[] getSearchPredicates(final Root<Book> root) {
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final List<Predicate> predicatesList = new ArrayList<>();
 
-        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-        List<Predicate> predicatesList = new ArrayList<>();
+        final String title = example.getTitle();
+        if ((title != null) && !"".equals(title)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("title")), '%' + title.toLowerCase() + '%'));
+        }
 
-        String title = this.example.getTitle();
-        if (title != null && !"".equals(title)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("title")),
-                    '%' + title.toLowerCase() + '%'));
+        final String description = example.getDescription();
+        if ((description != null) && !"".equals(description)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("description")), '%' + description.toLowerCase() + '%'));
         }
-        String description = this.example.getDescription();
-        if (description != null && !"".equals(description)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("description")),
-                    '%' + description.toLowerCase() + '%'));
+
+        final String isbn = example.getIsbn();
+        if ((isbn != null) && !"".equals(isbn)) {
+            predicatesList.add(builder.like(builder.lower(root.<String>get("isbn")), '%' + isbn.toLowerCase() + '%'));
         }
-        String isbn = this.example.getIsbn();
-        if (isbn != null && !"".equals(isbn)) {
-            predicatesList.add(builder.like(
-                    builder.lower(root.<String>get("isbn")),
-                    '%' + isbn.toLowerCase() + '%'));
-        }
-        Integer nbOfPage = this.example.getNbOfPage();
-        if (nbOfPage != null && nbOfPage.intValue() != 0) {
+
+        final Integer nbOfPage = example.getNbOfPage();
+        if ((nbOfPage != null) && (nbOfPage.intValue() != 0)) {
             predicatesList.add(builder.equal(root.get("nbOfPage"), nbOfPage));
         }
-        Language language = this.example.getLanguage();
+
+        final Language language = example.getLanguage();
         if (language != null) {
             predicatesList.add(builder.equal(root.get("language"), language));
         }
@@ -238,47 +211,31 @@ public class BookBean implements Serializable {
         return predicatesList.toArray(new Predicate[predicatesList.size()]);
     }
 
-   /*
-    * Support listing and POSTing back Book entities (e.g. from inside an HtmlSelectOneMenu)
-    */
-
     public List<Book> getPageItems() {
-        return this.pageItems;
+        return pageItems;
     }
 
     public long getCount() {
-        return this.count;
+        return count;
     }
 
     public List<Book> getAll() {
-
-        CriteriaQuery<Book> criteria = this.entityManager.getCriteriaBuilder()
-                .createQuery(Book.class);
-        return this.entityManager.createQuery(
-                criteria.select(criteria.from(Book.class))).getResultList();
+        final CriteriaQuery<Book> criteria = entityManager.getCriteriaBuilder().createQuery(Book.class);
+        return entityManager.createQuery(criteria.select(criteria.from(Book.class))).getResultList();
     }
 
-   /*
-    * Support adding children to bidirectional, one-to-many tables
-    */
-
     public Converter getConverter() {
-
-        final BookBean ejbProxy = this.sessionContext
-                .getBusinessObject(BookBean.class);
+        final BookBean ejbProxy = sessionContext.getBusinessObject(BookBean.class);
 
         return new Converter() {
-
             @Override
-            public Object getAsObject(FacesContext context,
-                                      UIComponent component, String value) {
+            public Object getAsObject(final FacesContext context, final UIComponent component, final String value) {
 
                 return ejbProxy.findById(Long.valueOf(value));
             }
 
             @Override
-            public String getAsString(FacesContext context,
-                                      UIComponent component, Object value) {
+            public String getAsString(final FacesContext context, final UIComponent component, final Object value) {
 
                 if (value == null) {
                     return "";
@@ -290,12 +247,12 @@ public class BookBean implements Serializable {
     }
 
     public Book getAdd() {
-        return this.add;
+        return add;
     }
 
     public Book getAdded() {
-        Book added = this.add;
-        this.add = new Book();
+        final Book added = add;
+        add = new Book();
         return added;
     }
 }

@@ -1,31 +1,34 @@
 package org.agoncal.application.invoice.model;
 
-import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.*;
-
-/**
- * @author Antonio Goncalves
- *         http://www.antoniogoncalves.org
- *         --
- */
 
 @Entity
 @NamedQuery(name = Invoice.FIND_MONTHLY, query = "SELECT i FROM Invoice i ORDER BY i.invoiceDate ASC")
 public class Invoice implements Serializable {
-
-    // ======================================
-    // =             Constants              =
-    // ======================================
+    private static final long serialVersionUID = 1L;
 
     public static final String FIND_MONTHLY = "Invoice.findMonthly";
-
-    // ======================================
-    // =             Attributes             =
-    // ======================================
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -88,14 +91,11 @@ public class Invoice implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<InvoiceLine> invoiceLines = new HashSet<>();
 
-    // ======================================
-    // =            Constructors            =
-    // ======================================
-
     public Invoice() {
     }
 
-    public Invoice(String firstName, String lastName, String email, String street1, String city, String zipcode, String country) {
+    public Invoice(final String firstName, final String lastName, final String email, final String street1, final String city, final String zipcode,
+            final String country) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -105,7 +105,7 @@ public class Invoice implements Serializable {
         this.zipcode = zipcode;
     }
 
-    public Invoice(String firstName, String lastName, String email, String street1, String city, String zipcode) {
+    public Invoice(final String firstName, final String lastName, final String email, final String street1, final String city, final String zipcode) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -114,21 +114,17 @@ public class Invoice implements Serializable {
         this.zipcode = zipcode;
     }
 
-    public Invoice(String firstName, String lastName, String email) {
+    public Invoice(final String firstName, final String lastName, final String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
     }
 
-    // ======================================
-    // =        Getters and Setters         =
-    // ======================================
-
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -136,7 +132,7 @@ public class Invoice implements Serializable {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(final int version) {
         this.version = version;
     }
 
@@ -144,12 +140,12 @@ public class Invoice implements Serializable {
         return invoiceDate;
     }
 
-    public void setInvoiceDate(Date invoiceDate) {
+    public void setInvoiceDate(final Date invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
 
     public int getMonth() {
-        Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance();
         cal.setTime(invoiceDate);
         return cal.get(Calendar.MONTH);
     }
@@ -158,7 +154,7 @@ public class Invoice implements Serializable {
         return totalBeforeDiscount;
     }
 
-    public void setTotalBeforeDiscount(Float totalBeforeDiscount) {
+    public void setTotalBeforeDiscount(final Float totalBeforeDiscount) {
         this.totalBeforeDiscount = totalBeforeDiscount;
     }
 
@@ -166,7 +162,7 @@ public class Invoice implements Serializable {
         return vatRate;
     }
 
-    public void setVatRate(Float vatRate) {
+    public void setVatRate(final Float vatRate) {
         this.vatRate = vatRate;
     }
 
@@ -174,7 +170,7 @@ public class Invoice implements Serializable {
         return vat;
     }
 
-    public void setVat(Float vat) {
+    public void setVat(final Float vat) {
         this.vat = vat;
     }
 
@@ -182,7 +178,7 @@ public class Invoice implements Serializable {
         return discount;
     }
 
-    public void setDiscount(Float discount) {
+    public void setDiscount(final Float discount) {
         this.discount = discount;
     }
 
@@ -190,7 +186,7 @@ public class Invoice implements Serializable {
         return discountRate;
     }
 
-    public void setDiscountRate(Float discountRate) {
+    public void setDiscountRate(final Float discountRate) {
         this.discountRate = discountRate;
     }
 
@@ -198,7 +194,7 @@ public class Invoice implements Serializable {
         return totalAfterDiscount;
     }
 
-    public void setTotalAfterDiscount(Float totalAfterDiscount) {
+    public void setTotalAfterDiscount(final Float totalAfterDiscount) {
         this.totalAfterDiscount = totalAfterDiscount;
     }
 
@@ -206,7 +202,7 @@ public class Invoice implements Serializable {
         return totalAfterVat;
     }
 
-    public void setTotalAfterVat(Float totalAfterVat) {
+    public void setTotalAfterVat(final Float totalAfterVat) {
         this.totalAfterVat = totalAfterVat;
     }
 
@@ -214,7 +210,7 @@ public class Invoice implements Serializable {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
 
@@ -222,7 +218,7 @@ public class Invoice implements Serializable {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
+    public void setLastName(final String lastName) {
         this.lastName = lastName;
     }
 
@@ -230,7 +226,7 @@ public class Invoice implements Serializable {
         return telephone;
     }
 
-    public void setTelephone(String telephone) {
+    public void setTelephone(final String telephone) {
         this.telephone = telephone;
     }
 
@@ -238,7 +234,7 @@ public class Invoice implements Serializable {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -246,7 +242,7 @@ public class Invoice implements Serializable {
         return street1;
     }
 
-    public void setStreet1(String street1) {
+    public void setStreet1(final String street1) {
         this.street1 = street1;
     }
 
@@ -254,7 +250,7 @@ public class Invoice implements Serializable {
         return street2;
     }
 
-    public void setStreet2(String street2) {
+    public void setStreet2(final String street2) {
         this.street2 = street2;
     }
 
@@ -262,7 +258,7 @@ public class Invoice implements Serializable {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(final String city) {
         this.city = city;
     }
 
@@ -270,7 +266,7 @@ public class Invoice implements Serializable {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -278,7 +274,7 @@ public class Invoice implements Serializable {
         return zipcode;
     }
 
-    public void setZipcode(String zipcode) {
+    public void setZipcode(final String zipcode) {
         this.zipcode = zipcode;
     }
 
@@ -286,7 +282,7 @@ public class Invoice implements Serializable {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(final String country) {
         this.country = country;
     }
 
@@ -294,28 +290,25 @@ public class Invoice implements Serializable {
         return invoiceLines;
     }
 
-    public void setInvoiceLines(Set<InvoiceLine> invoiceLines) {
+    public void setInvoiceLines(final Set<InvoiceLine> invoiceLines) {
         this.invoiceLines = invoiceLines;
     }
 
-    public void addInvoiceLine(InvoiceLine invoiceLine) {
+    public void addInvoiceLine(final InvoiceLine invoiceLine) {
         invoiceLines.add(invoiceLine);
     }
 
-    // ======================================
-    // =   Methods hash, equals, toString   =
-    // ======================================
-
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Invoice invoice = (Invoice) o;
-        return Objects.equals(invoiceDate, invoice.invoiceDate) &&
-                Objects.equals(firstName, invoice.firstName) &&
-                Objects.equals(lastName, invoice.lastName) &&
-                Objects.equals(email, invoice.email) &&
-                Objects.equals(invoiceLines, invoice.invoiceLines);
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+        final Invoice invoice = (Invoice) o;
+        return Objects.equals(invoiceDate, invoice.invoiceDate) && Objects.equals(firstName, invoice.firstName) && Objects.equals(lastName, invoice.lastName)
+                && Objects.equals(email, invoice.email) && Objects.equals(invoiceLines, invoice.invoiceLines);
     }
 
     @Override
@@ -325,28 +318,10 @@ public class Invoice implements Serializable {
 
     @Override
     public String toString() {
-        return "Invoice{" +
-                "city='" + city + '\'' +
-                ", id=" + id +
-                ", version=" + version +
-                ", invoiceDate=" + invoiceDate +
-                ", totalBeforeDiscount=" + totalBeforeDiscount +
-                ", discountRate=" + discountRate +
-                ", discount=" + discount +
-                ", totalAfterDiscount=" + totalAfterDiscount +
-                ", vatRate=" + vatRate +
-                ", vat=" + vat +
-                ", totalAfterVat=" + totalAfterVat +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", telephone='" + telephone + '\'' +
-                ", email='" + email + '\'' +
-                ", street1='" + street1 + '\'' +
-                ", street2='" + street2 + '\'' +
-                ", state='" + state + '\'' +
-                ", zipcode='" + zipcode + '\'' +
-                ", country='" + country + '\'' +
-                ", invoiceLines=" + invoiceLines +
-                '}';
+        return "Invoice{" + "city='" + city + '\'' + ", id=" + id + ", version=" + version + ", invoiceDate=" + invoiceDate + ", totalBeforeDiscount="
+                + totalBeforeDiscount + ", discountRate=" + discountRate + ", discount=" + discount + ", totalAfterDiscount=" + totalAfterDiscount
+                + ", vatRate=" + vatRate + ", vat=" + vat + ", totalAfterVat=" + totalAfterVat + ", firstName='" + firstName + '\'' + ", lastName='" + lastName
+                + '\'' + ", telephone='" + telephone + '\'' + ", email='" + email + '\'' + ", street1='" + street1 + '\'' + ", street2='" + street2 + '\''
+                + ", state='" + state + '\'' + ", zipcode='" + zipcode + '\'' + ", country='" + country + '\'' + ", invoiceLines=" + invoiceLines + '}';
     }
 }
